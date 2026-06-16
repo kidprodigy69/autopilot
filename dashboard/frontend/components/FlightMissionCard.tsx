@@ -207,7 +207,9 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                   style={{ boxShadow: `0 0 16px ${cfg.glow}` }}>
                   <AlertCircle size={13} className={cfg.text} />
                   <span className={cn("text-sm font-black mt-0.5", cfg.text)}>{action}</span>
-                  <span className="text-xs text-slate-500">{confidence}%</span>
+                  <span className="text-xs text-slate-500">
+                    {confidence < 40 ? "Low" : confidence < 70 ? "Med" : "High"}
+                  </span>
                 </div>
               </motion.div>
             </div>
@@ -233,10 +235,12 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
             {/* Stats row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <div className="text-xs text-slate-400 mb-1">Confidence</div>
+                <div className="text-xs text-slate-400 mb-1">Signal Strength</div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-bold text-cyan-400">{confidence}</span>
-                  <span className="text-xs text-slate-400">%</span>
+                  <span className={cn("text-xl font-bold", cfg.text)}>
+                    {confidence < 40 ? "Low" : confidence < 70 ? "Med" : "High"}
+                  </span>
+                  <span className="text-xs text-slate-600">{confidence}%</span>
                 </div>
                 <div className="mt-1.5 h-1.5 bg-slate-700 rounded-full overflow-hidden">
                   <motion.div
@@ -245,6 +249,9 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                     className={cn("h-full rounded-full bg-gradient-to-r", cfg.gradient)}
                   />
                 </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  {confidence < 40 ? "Building history" : confidence < 70 ? "Moderate data" : "Strong signal"}
+                </p>
               </div>
               <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
                 <div className="text-xs text-slate-400 mb-1">Days Away</div>

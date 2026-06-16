@@ -57,22 +57,26 @@ const EMPTY: AutopilotData = {
 export default function Dashboard() {
   const [data, setData] = useState<AutopilotData>(EMPTY);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (manual = false) => {
+    if (manual) setRefreshing(true);
     try {
-      const res = await fetch(`/data/autopilot.json?t=${Date.now()}`);
+      const res = await fetch(`/data/autopilot.json?t=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);
     } catch (e) {
       console.error("Failed to load autopilot data:", e);
     } finally {
       setLoading(false);
+      if (manual) setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 10 * 60 * 1000);
+    fetchData(false);
+    const interval = setInterval(() => fetchData(false), 10 * 60 * 1000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -107,11 +111,12 @@ export default function Dashboard() {
               </div>
             )}
             <button
-              onClick={fetchData}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs hover:bg-sky-500/20 transition-colors"
+              onClick={() => fetchData(true)}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs hover:bg-sky-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw size={11} />
-              Refresh
+              <RefreshCw size={11} className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Refreshing…" : "Refresh"}
             </button>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Zap size={12} className="text-amber-400" />
