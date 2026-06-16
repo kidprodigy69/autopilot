@@ -143,7 +143,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeTrips.map((t) => {
-                const opts = data.flight_options[t.id];
+                const opts = (data.flight_options ?? {})[t.id];
                 return (
                   <FlightMissionCard
                     key={t.id}

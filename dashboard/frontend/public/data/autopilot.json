@@ -11,11 +11,8 @@
       "duration_days": 5,
       "passengers": 2,
       "cabin_class": "ECONOMY",
-      "preferred_airlines": [
-        "AA"
-      ],
-      "max_price_total": 1200,
-      "nonstop_only": false,
+      "preferred_airlines": ["AA"],
+      "nonstop_only": true,
       "active": true
     },
     {
@@ -28,33 +25,68 @@
       "duration_days": 6,
       "passengers": 2,
       "cabin_class": "ECONOMY",
-      "preferred_airlines": [],
-      "max_price_total": 1200,
-      "nonstop_only": false,
+      "preferred_airlines": ["AA"],
+      "nonstop_only": true,
       "active": true
     }
   ],
+  "flight_options": {
+    "traverse_city": {
+      "morning": {
+        "available": true,
+        "price_total": 1129.0,
+        "price_per_person": 564.5,
+        "depart_time": "—",
+        "flight_number": null,
+        "airline": "American Airlines"
+      },
+      "afternoon": {
+        "available": false,
+        "price_total": null,
+        "price_per_person": null,
+        "depart_time": null,
+        "flight_number": null,
+        "airline": null
+      }
+    },
+    "orlando": {
+      "morning": {
+        "available": true,
+        "price_total": 734.0,
+        "price_per_person": 367.0,
+        "depart_time": "—",
+        "flight_number": null,
+        "airline": "American Airlines"
+      },
+      "afternoon": {
+        "available": false,
+        "price_total": null,
+        "price_per_person": null,
+        "depart_time": null,
+        "flight_number": null,
+        "airline": null
+      }
+    }
+  },
   "signals": [
     {
       "trip_id": "traverse_city",
       "action": "WAIT",
       "confidence": 0.3,
-      "current_price": 1129.0,
-      "predicted_low": 1016.1,
-      "predicted_high": 1241.9,
+      "best_price_per_person": 564.5,
+      "predicted_low_per_person": 508.05,
       "days_to_depart": 64,
-      "reasoning": "Collecting price history \u2014 check back in a few days for a signal.",
+      "reasoning": "Collecting price history — check back in a few days for a signal.",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
       "confidence": 0.3,
-      "current_price": 734.0,
-      "predicted_low": 660.6,
-      "predicted_high": 807.4,
+      "best_price_per_person": 367.0,
+      "predicted_low_per_person": 330.3,
       "days_to_depart": 174,
-      "reasoning": "Collecting price history \u2014 check back in a few days for a signal.",
+      "reasoning": "Collecting price history — check back in a few days for a signal.",
       "trend": "STABLE"
     }
   ],
@@ -62,22 +94,16 @@
     "traverse_city": [
       {
         "ts": "2026-06-16T04:39:42.900381",
-        "price": 1129.0
+        "morning": 564.5,
+        "afternoon": null
       }
     ],
     "orlando": [
       {
         "ts": "2026-06-16T04:39:42.900663",
-        "price": 734.0
+        "morning": 367.0,
+        "afternoon": null
       }
     ]
-  },
-  "best_offers": {
-    "traverse_city": {
-      "price_total": 1129.0
-    },
-    "orlando": {
-      "price_total": 734.0
-    }
   }
 }

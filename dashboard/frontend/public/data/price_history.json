@@ -2,15 +2,15 @@
   "traverse_city": [
     {
       "ts": "2026-06-16T04:39:42.900381",
-      "price": 1129.0,
-      "airline": "American"
+      "morning": 564.5,
+      "afternoon": null
     }
   ],
   "orlando": [
     {
       "ts": "2026-06-16T04:39:42.900663",
-      "price": 734.0,
-      "airline": "Southwest"
+      "morning": 367.0,
+      "afternoon": null
     }
   ]
 }
