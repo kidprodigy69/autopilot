@@ -1,11 +1,11 @@
 """
-Scraper Agent — fetches live pricing via SerpAPI's Google Flights endpoint.
-Free plan: 250 searches/month. At 2 flights × 4 checks/day = 240/month — fits clean.
+Scraper Agent — round-trip price search via SerpAPI Google Flights.
+Fetches combined outbound + return price as one total per trip.
+Free plan: 250 searches/month. 2 trips x 2 checks/day x 30 days = 120/month.
 """
 import os
 import json
 import httpx
-import asyncio
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
@@ -22,7 +22,8 @@ def load_config() -> dict:
     return json.loads(CONFIG_PATH.read_text())
 
 
-async def fetch_flight_offers(mission: dict) -> list[dict]:
+async def fetch_trip_offers(trip: dict) -> list[dict]:
+    """Fetch round-trip flight offers for a trip (outbound + return combined)."""
     api_key = os.getenv("SERPAPI_KEY")
     if not api_key:
         raise ValueError("SERPAPI_KEY not set in .env")
@@ -30,16 +31,17 @@ async def fetch_flight_offers(mission: dict) -> list[dict]:
     params = {
         "engine": "google_flights",
         "api_key": api_key,
-        "departure_id": mission["origin"],
-        "arrival_id": mission["destination"],
-        "outbound_date": mission["depart_date"],
-        "adults": mission["passengers"],
-        "travel_class": _CABIN.get(mission["cabin_class"], 1),
+        "departure_id": trip["origin"],
+        "arrival_id": trip["destination"],
+        "outbound_date": trip["depart_date"],
+        "return_date": trip["return_date"],
+        "adults": trip["passengers"],
+        "travel_class": _CABIN.get(trip["cabin_class"], 1),
         "currency": "USD",
         "hl": "en",
-        "type": "2",  # one-way
+        "type": "1",  # 1 = round trip
     }
-    if mission.get("nonstop_only"):
+    if trip.get("nonstop_only"):
         params["stops"] = "1"
 
     async with httpx.AsyncClient(timeout=30) as client:
@@ -53,55 +55,58 @@ async def fetch_flight_offers(mission: dict) -> list[dict]:
         if price_total == 0:
             continue
 
+        # Round trip results have two itineraries: [0] outbound, [1] return
         legs = flight.get("flights", [{}])
-        first, last = legs[0], legs[-1]
-        airline_code = first.get("airline", "")
+        first_leg = legs[0] if legs else {}
+        airline = first_leg.get("airline", "")
 
         offers.append({
             "price_total": price_total,
-            "price_per_person": round(price_total / mission["passengers"], 2),
-            "stops": len(legs) - 1,
-            "airline": first.get("airline", ""),
-            "airline_logo": first.get("airline_logo", ""),
-            "duration_minutes": flight.get("total_duration", 0),
-            "depart_time": first.get("departure_airport", {}).get("time", ""),
-            "arrive_time": last.get("arrival_airport", {}).get("time", ""),
+            "price_per_person": round(price_total / trip["passengers"], 2),
+            "stops_outbound": flight.get("layovers", 0),
+            "airline": airline,
+            "airline_logo": first_leg.get("airline_logo", ""),
+            "total_duration_minutes": flight.get("total_duration", 0),
+            "depart_time": first_leg.get("departure_airport", {}).get("time", ""),
             "fetched_at": datetime.utcnow().isoformat(),
-            "mission_id": mission["id"],
+            "trip_id": trip["id"],
         })
 
     return sorted(offers, key=lambda x: x["price_total"])
 
 
-async def fetch_cheapest_dates(mission: dict) -> list[dict]:
+async def fetch_cheapest_dates(trip: dict) -> list[dict]:
     """
-    Checks ±5 days around the target date for cheaper alternatives.
-    Costs 10 API calls — call this manually from the dashboard, not on every poll.
+    Varies the outbound date ±5 days (keeping trip duration fixed) to find
+    cheaper windows. Costs 10 API calls — call from dashboard manually.
     """
     api_key = os.getenv("SERPAPI_KEY")
     if not api_key:
         return []
 
-    target = date.fromisoformat(mission["depart_date"])
-    date_range = [target + timedelta(days=i) for i in range(-5, 6)]
-
+    depart = date.fromisoformat(trip["depart_date"])
+    duration = trip["duration_days"]
     results = []
+
     async with httpx.AsyncClient(timeout=20) as client:
-        for d in date_range:
+        for offset in range(-5, 6):
+            out = depart + timedelta(days=offset)
+            ret = out + timedelta(days=duration)
             try:
                 resp = await client.get(
                     SERPAPI_BASE,
                     params={
                         "engine": "google_flights",
                         "api_key": api_key,
-                        "departure_id": mission["origin"],
-                        "arrival_id": mission["destination"],
-                        "outbound_date": d.isoformat(),
-                        "adults": mission["passengers"],
-                        "travel_class": 1,
+                        "departure_id": trip["origin"],
+                        "arrival_id": trip["destination"],
+                        "outbound_date": out.isoformat(),
+                        "return_date": ret.isoformat(),
+                        "adults": trip["passengers"],
+                        "travel_class": _CABIN.get(trip["cabin_class"], 1),
                         "currency": "USD",
                         "hl": "en",
-                        "type": "2",
+                        "type": "1",
                     },
                     timeout=15,
                 )
@@ -110,22 +115,26 @@ async def fetch_cheapest_dates(mission: dict) -> list[dict]:
                 if flights:
                     best = float(flights[0].get("price", 0))
                     if best > 0:
-                        results.append({"date": d.isoformat(), "price": best})
+                        results.append({
+                            "depart_date": out.isoformat(),
+                            "return_date": ret.isoformat(),
+                            "price": best,
+                        })
             except Exception:
                 continue
 
     return sorted(results, key=lambda x: x["price"])
 
 
-async def run_all_missions() -> dict:
+async def run_all_trips() -> dict:
     config = load_config()
     results = {}
-    for m in config["missions"]:
-        if not m.get("active"):
+    for trip in config["trips"]:
+        if not trip.get("active"):
             continue
         try:
-            offers = await fetch_flight_offers(m)
-            results[m["id"]] = {"offers": offers, "error": None}
+            offers = await fetch_trip_offers(trip)
+            results[trip["id"]] = {"offers": offers, "error": None}
         except Exception as e:
-            results[m["id"]] = {"error": str(e), "offers": []}
+            results[trip["id"]] = {"error": str(e), "offers": []}
     return results

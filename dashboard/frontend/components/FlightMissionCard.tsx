@@ -2,11 +2,12 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plane, TrendingUp, TrendingDown, Clock, AlertCircle } from "lucide-react";
+import { Plane, TrendingUp, TrendingDown, Clock, AlertCircle, ArrowLeftRight, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
 
 type Signal = {
-  mission_id: string;
+  trip_id: string;
   action: "BUY" | "HOLD" | "WAIT";
   confidence: number;
   reasoning: string;
@@ -17,18 +18,20 @@ type Signal = {
   predicted_high: number;
 };
 
-type Mission = {
+type Trip = {
   id: string;
   label: string;
   origin: string;
   destination: string;
   depart_date: string;
+  return_date: string;
+  duration_days: number;
   passengers: number;
   preferred_airlines: string[];
 };
 
 type Props = {
-  mission: Mission;
+  trip: Trip;
   currentPrice: number | null;
   prevPrice: number | null;
   signal: Signal | null;
@@ -59,7 +62,7 @@ const SIGNAL_CONFIG = {
   },
 };
 
-export default function FlightMissionCard({ mission, currentPrice, prevPrice, signal, loading }: Props) {
+export default function FlightMissionCard({ trip, currentPrice, prevPrice, signal, loading }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -73,6 +76,15 @@ export default function FlightMissionCard({ mission, currentPrice, prevPrice, si
   const priceChange = currentPrice && prevPrice ? currentPrice - prevPrice : null;
   const priceChangePct = priceChange && prevPrice ? ((priceChange / prevPrice) * 100).toFixed(1) : null;
   const isPriceDown = priceChange !== null && priceChange < 0;
+
+  const perPerson = currentPrice ? currentPrice / trip.passengers : null;
+
+  const departFormatted = trip.depart_date
+    ? format(parseISO(trip.depart_date), "MMM d")
+    : "";
+  const returnFormatted = trip.return_date
+    ? format(parseISO(trip.return_date), "MMM d, yyyy")
+    : "";
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
@@ -93,9 +105,7 @@ export default function FlightMissionCard({ mission, currentPrice, prevPrice, si
   const rot = getRotation();
 
   if (loading) {
-    return (
-      <div className="rounded-2xl bg-slate-800/50 border border-slate-700/50 h-72 animate-pulse" />
-    );
+    return <div className="rounded-2xl bg-slate-800/50 border border-slate-700/50 h-80 animate-pulse" />;
   }
 
   return (
@@ -115,9 +125,7 @@ export default function FlightMissionCard({ mission, currentPrice, prevPrice, si
           transformStyle: "preserve-3d",
         }}
       >
-        {/* Card */}
         <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-          {/* Base bg */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
 
           {/* Animated ambient glow */}
@@ -151,72 +159,78 @@ export default function FlightMissionCard({ mission, currentPrice, prevPrice, si
             ))}
           </div>
 
-          {/* Glass border */}
           <div className="absolute inset-0 backdrop-blur-sm bg-slate-900/40 border border-slate-700/50" />
 
-          {/* Content */}
           <div className="relative p-6 space-y-4">
-            {/* Route header */}
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                <Plane className="w-5 h-5 text-cyan-400" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">{mission.origin}</span>
-                <div className="flex items-center gap-1">
-                  <div className="w-8 h-px bg-gradient-to-r from-cyan-500 to-transparent" />
-                  <Plane className="w-4 h-4 text-cyan-400 rotate-90" />
-                  <div className="w-8 h-px bg-gradient-to-l from-cyan-500 to-transparent" />
+            {/* Route header — round trip indicator */}
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <ArrowLeftRight size={12} className="text-cyan-500" />
+                  <span className="text-xs text-cyan-500 font-semibold uppercase tracking-wider">
+                    Round Trip · {trip.duration_days} days
+                  </span>
                 </div>
-                <span className="text-2xl font-bold text-white">{mission.destination}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-white">{trip.origin}</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-6 h-px bg-gradient-to-r from-cyan-500 to-transparent" />
+                    <Plane size={14} className="text-cyan-400 rotate-90" />
+                    <div className="w-6 h-px bg-gradient-to-l from-cyan-500 to-transparent" />
+                  </div>
+                  <span className="text-2xl font-bold text-white">{trip.destination}</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {departFormatted} → {returnFormatted}
+                </p>
               </div>
-              <span className="ml-auto text-xs text-slate-500">
-                {new Date(mission.depart_date + "T12:00:00").toLocaleDateString("en-US", {
-                  month: "short", day: "numeric", year: "numeric",
-                })}
-              </span>
+
+              {/* Signal badge */}
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                <div
+                  className={cn(
+                    "flex flex-col items-center px-3 py-2 rounded-xl border backdrop-blur-sm",
+                    cfg.bg, cfg.border
+                  )}
+                  style={{ boxShadow: `0 0 16px ${cfg.glow}` }}
+                >
+                  <AlertCircle size={14} className={cfg.text} />
+                  <span className={cn("text-sm font-black mt-0.5", cfg.text)}>{action}</span>
+                </div>
+              </motion.div>
             </div>
 
-            {/* Signal badge */}
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-              <div
-                className={cn(
-                  "inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm border backdrop-blur-sm",
-                  cfg.bg, cfg.border, cfg.text
-                )}
-                style={{ boxShadow: `0 0 20px ${cfg.glow}` }}
-              >
-                <AlertCircle className="w-4 h-4" />
-                {action}
-              </div>
-            </motion.div>
-
-            {/* Price */}
+            {/* Price — round trip total */}
             <div className="space-y-1">
               {currentPrice ? (
-                <div className="flex items-baseline gap-3">
-                  <span className="text-5xl font-bold text-white tabular-nums">
-                    ${currentPrice.toFixed(0)}
-                  </span>
-                  {priceChange !== null && priceChangePct !== null && (
-                    <div className={cn("flex items-center gap-1", isPriceDown ? "text-emerald-400" : "text-red-400")}>
-                      {isPriceDown ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
-                      <span className="text-base font-semibold">
-                        {isPriceDown ? "" : "+"}${Math.abs(priceChange).toFixed(0)} ({priceChangePct}%)
-                      </span>
-                    </div>
-                  )}
-                </div>
+                <>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-bold text-white tabular-nums">
+                      ${currentPrice.toFixed(0)}
+                    </span>
+                    {priceChange !== null && priceChangePct !== null && (
+                      <div className={cn("flex items-center gap-1", isPriceDown ? "text-emerald-400" : "text-red-400")}>
+                        {isPriceDown ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                        <span className="text-sm font-semibold">
+                          {isPriceDown ? "" : "+"}${Math.abs(priceChange).toFixed(0)} ({priceChangePct}%)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <span>round-trip total</span>
+                    <span>·</span>
+                    <Users size={11} className="text-slate-600" />
+                    <span>${perPerson?.toFixed(0)} per person</span>
+                    {prevPrice && <span>· prev ${prevPrice.toFixed(0)}</span>}
+                  </div>
+                </>
               ) : (
-                <div className="h-14 w-40 rounded-lg bg-slate-800 animate-pulse" />
+                <div className="h-14 w-48 rounded-lg bg-slate-800 animate-pulse" />
               )}
-              {prevPrice && (
-                <p className="text-slate-500 text-sm">Previous: ${prevPrice.toFixed(0)}</p>
-              )}
-              <p className="text-slate-500 text-xs">{mission.passengers} passengers</p>
             </div>
 
-            {/* Stats grid */}
+            {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm">
                 <div className="text-xs text-slate-400 mb-1">Confidence</div>
@@ -237,11 +251,11 @@ export default function FlightMissionCard({ mission, currentPrice, prevPrice, si
               <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm">
                 <div className="text-xs text-slate-400 mb-1">Days Away</div>
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
+                  <Clock size={16} className="text-cyan-400" />
                   <span className="text-2xl font-bold text-white">{daysAway}</span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  {daysAway < 14 ? "Book soon!" : daysAway < 45 ? "Sweet spot" : "Plenty of time"}
+                  {daysAway < 14 ? "Book now!" : daysAway < 45 ? "Sweet spot" : "Watch & wait"}
                 </div>
               </div>
             </div>

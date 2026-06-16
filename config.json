@@ -9,62 +9,40 @@
     ],
     "price_drop_threshold_pct": 5
   },
-  "missions": [
+  "trips": [
     {
-      "id": "tvc_out",
-      "label": "Charlotte → Traverse City",
+      "id": "traverse_city",
+      "label": "Traverse City Trip",
       "origin": "CLT",
       "destination": "TVC",
       "depart_date": "2026-08-19",
+      "return_date": "2026-08-23",
+      "duration_days": 5,
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": ["AA"],
-      "max_price_per_person": 400,
+      "max_price_total": 1200,
       "nonstop_only": false,
       "active": true
     },
     {
-      "id": "tvc_ret",
-      "label": "Traverse City → Charlotte",
-      "origin": "TVC",
-      "destination": "CLT",
-      "depart_date": "2026-08-23",
-      "passengers": 2,
-      "cabin_class": "ECONOMY",
-      "preferred_airlines": ["AA"],
-      "max_price_per_person": 400,
-      "nonstop_only": false,
-      "active": true
-    },
-    {
-      "id": "mco_out",
-      "label": "Charlotte → Orlando",
+      "id": "orlando",
+      "label": "Orlando Trip",
       "origin": "CLT",
       "destination": "MCO",
       "depart_date": "2026-12-07",
+      "return_date": "2026-12-13",
+      "duration_days": 6,
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": [],
-      "max_price_per_person": 400,
-      "nonstop_only": false,
-      "active": true
-    },
-    {
-      "id": "mco_ret",
-      "label": "Orlando → Charlotte",
-      "origin": "MCO",
-      "destination": "CLT",
-      "depart_date": "2026-12-13",
-      "passengers": 2,
-      "cabin_class": "ECONOMY",
-      "preferred_airlines": [],
-      "max_price_per_person": 400,
+      "max_price_total": 1200,
       "nonstop_only": false,
       "active": true
     }
   ],
   "serpapi": {
     "base_url": "https://serpapi.com/search",
-    "note": "Free plan: 250 searches/month. 4 flights x 2 checks/day x 30 days = 240/month."
+    "note": "Free plan: 250 searches/month. 2 trips x 2 checks/day x 30 days = 120/month."
   }
 }
