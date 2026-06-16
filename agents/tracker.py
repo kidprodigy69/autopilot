@@ -62,7 +62,9 @@ def write_public_data(config: dict, signals: list, current_prices: dict):
 def git_push():
     try:
         subprocess.run(
-            ["git", "add", "dashboard/frontend/public/data/autopilot.json"],
+            ["git", "add",
+             "dashboard/frontend/public/data/autopilot.json",
+             "dashboard/frontend/public/data/price_history.json"],
             cwd=REPO_ROOT, check=True, capture_output=True,
         )
         if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=REPO_ROOT, capture_output=True).returncode == 0:

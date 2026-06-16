@@ -8,7 +8,7 @@ from pathlib import Path
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass, asdict
 
-HISTORY_PATH = Path(__file__).parent.parent / "data" / "price_history.json"
+HISTORY_PATH = Path(__file__).parent.parent / "dashboard" / "frontend" / "public" / "data" / "price_history.json"
 
 
 def load_history() -> dict:
