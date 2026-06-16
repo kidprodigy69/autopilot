@@ -1,163 +1,83 @@
 {
-  "updated_at": "2026-06-16T04:13:57.874090Z",
-  "missions": [
+  "updated_at": "2026-06-16T04:39:45.557829Z",
+  "trips": [
     {
-      "id": "tvc_out",
-      "label": "Charlotte \u2192 Traverse City",
+      "id": "traverse_city",
+      "label": "Traverse City Trip",
       "origin": "CLT",
       "destination": "TVC",
       "depart_date": "2026-08-19",
+      "return_date": "2026-08-23",
+      "duration_days": 5,
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": [
         "AA"
       ],
-      "max_price_per_person": 400,
+      "max_price_total": 1200,
       "nonstop_only": false,
       "active": true
     },
     {
-      "id": "tvc_ret",
-      "label": "Traverse City \u2192 Charlotte",
-      "origin": "TVC",
-      "destination": "CLT",
-      "depart_date": "2026-08-23",
-      "passengers": 2,
-      "cabin_class": "ECONOMY",
-      "preferred_airlines": [
-        "AA"
-      ],
-      "max_price_per_person": 400,
-      "nonstop_only": false,
-      "active": true
-    },
-    {
-      "id": "mco_out",
-      "label": "Charlotte \u2192 Orlando",
+      "id": "orlando",
+      "label": "Orlando Trip",
       "origin": "CLT",
       "destination": "MCO",
       "depart_date": "2026-12-07",
+      "return_date": "2026-12-13",
+      "duration_days": 6,
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": [],
-      "max_price_per_person": 400,
-      "nonstop_only": false,
-      "active": true
-    },
-    {
-      "id": "mco_ret",
-      "label": "Orlando \u2192 Charlotte",
-      "origin": "MCO",
-      "destination": "CLT",
-      "depart_date": "2026-12-13",
-      "passengers": 2,
-      "cabin_class": "ECONOMY",
-      "preferred_airlines": [],
-      "max_price_per_person": 400,
+      "max_price_total": 1200,
       "nonstop_only": false,
       "active": true
     }
   ],
   "signals": [
     {
-      "mission_id": "tvc_out",
+      "trip_id": "traverse_city",
       "action": "WAIT",
       "confidence": 0.3,
-      "current_price": 596.0,
-      "predicted_low": 536.4,
-      "predicted_high": 655.6,
+      "current_price": 1129.0,
+      "predicted_low": 1016.1,
+      "predicted_high": 1241.9,
       "days_to_depart": 64,
-      "reasoning": "Insufficient price history \u2014 collecting data.",
+      "reasoning": "Collecting price history \u2014 check back in a few days for a signal.",
       "trend": "STABLE"
     },
     {
-      "mission_id": "tvc_ret",
+      "trip_id": "orlando",
       "action": "WAIT",
       "confidence": 0.3,
-      "current_price": 750.0,
-      "predicted_low": 675.0,
-      "predicted_high": 825.0000000000001,
-      "days_to_depart": 68,
-      "reasoning": "Insufficient price history \u2014 collecting data.",
-      "trend": "STABLE"
-    },
-    {
-      "mission_id": "mco_out",
-      "action": "WAIT",
-      "confidence": 0.3,
-      "current_price": 329.0,
-      "predicted_low": 296.1,
-      "predicted_high": 361.90000000000003,
+      "current_price": 734.0,
+      "predicted_low": 660.6,
+      "predicted_high": 807.4,
       "days_to_depart": 174,
-      "reasoning": "Insufficient price history \u2014 collecting data.",
-      "trend": "STABLE"
-    },
-    {
-      "mission_id": "mco_ret",
-      "action": "WAIT",
-      "confidence": 0.3,
-      "current_price": 405.0,
-      "predicted_low": 364.5,
-      "predicted_high": 445.50000000000006,
-      "days_to_depart": 180,
-      "reasoning": "Insufficient price history \u2014 collecting data.",
+      "reasoning": "Collecting price history \u2014 check back in a few days for a signal.",
       "trend": "STABLE"
     }
   ],
   "history": {
-    "tvc_out": [
+    "traverse_city": [
       {
-        "ts": "2026-06-16T04:10:23.670721",
-        "price": 596.0
-      },
-      {
-        "ts": "2026-06-16T04:13:57.872233",
-        "price": 596.0
+        "ts": "2026-06-16T04:39:42.900381",
+        "price": 1129.0
       }
     ],
-    "tvc_ret": [
+    "orlando": [
       {
-        "ts": "2026-06-16T04:10:23.671338",
-        "price": 750.0
-      },
-      {
-        "ts": "2026-06-16T04:13:57.872582",
-        "price": 750.0
-      }
-    ],
-    "mco_out": [
-      {
-        "ts": "2026-06-16T04:10:23.671603",
-        "price": 329.0
-      },
-      {
-        "ts": "2026-06-16T04:13:57.872791",
-        "price": 329.0
-      }
-    ],
-    "mco_ret": [
-      {
-        "ts": "2026-06-16T04:10:23.671794",
-        "price": 405.0
-      },
-      {
-        "ts": "2026-06-16T04:13:57.872972",
-        "price": 405.0
+        "ts": "2026-06-16T04:39:42.900663",
+        "price": 734.0
       }
     ]
   },
   "best_offers": {
-    "tvc_out": {
-      "price_total": 596.0
+    "traverse_city": {
+      "price_total": 1129.0
     },
-    "tvc_ret": {
-      "price_total": 750.0
-    },
-    "mco_out": {
-      "price_total": 329.0
-    },
-    "mco_ret": {
-      "price_total": 405.0
+    "orlando": {
+      "price_total": 734.0
     }
   }
 }
