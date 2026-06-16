@@ -71,6 +71,12 @@ export default function Dashboard() {
   const sigMap: Record<string, Signal> = {};
   for (const s of data.signals) sigMap[s.mission_id] = s;
 
+  // Get second-to-last history point as "previous price" for the delta display
+  const getPrevPrice = (missionId: string): number | null => {
+    const pts = data.history[missionId] ?? [];
+    return pts.length >= 2 ? pts[pts.length - 2].price : null;
+  };
+
   return (
     <div className="min-h-screen bg-[#080f1a]">
       {/* Header */}
@@ -143,7 +149,7 @@ export default function Dashboard() {
                   key={m.id}
                   mission={m}
                   currentPrice={sigMap[m.id]?.current_price ?? data.best_offers[m.id]?.price_total ?? null}
-                  prevPrice={null}
+                  prevPrice={getPrevPrice(m.id)}
                   signal={sigMap[m.id] ?? null}
                   loading={loading}
                 />
