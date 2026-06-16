@@ -47,7 +47,14 @@
         "depart_time": null,
         "flight_number": null,
         "airline": null
-      }
+      },
+      "price_insights": {
+        "price_level": null,
+        "typical_range_ppp": null,
+        "lowest_ppp": null,
+        "google_history_ppp": []
+      },
+      "aa_nonstop_count": 1
     },
     "orlando": {
       "morning": {
@@ -65,28 +72,43 @@
         "depart_time": null,
         "flight_number": null,
         "airline": null
-      }
+      },
+      "price_insights": {
+        "price_level": null,
+        "typical_range_ppp": null,
+        "lowest_ppp": null,
+        "google_history_ppp": []
+      },
+      "aa_nonstop_count": 1
     }
   },
   "signals": [
     {
       "trip_id": "traverse_city",
       "action": "WAIT",
-      "confidence": 0.3,
+      "confidence": 0.35,
       "best_price_per_person": 564.5,
       "predicted_low_per_person": 508.05,
+      "typical_range_ppp": null,
+      "price_level": null,
+      "aa_nonstop_count": 1,
+      "data_points": 1,
       "days_to_depart": 64,
-      "reasoning": "Collecting price history — check back in a few days for a signal.",
+      "reasoning": "Awaiting first live poll — Google price data and route intelligence will populate on next Auto run (8am or 8pm EST).",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
-      "confidence": 0.3,
+      "confidence": 0.35,
       "best_price_per_person": 367.0,
       "predicted_low_per_person": 330.3,
+      "typical_range_ppp": null,
+      "price_level": null,
+      "aa_nonstop_count": 1,
+      "data_points": 1,
       "days_to_depart": 174,
-      "reasoning": "Collecting price history — check back in a few days for a signal.",
+      "reasoning": "Awaiting first live poll — Google price data and route intelligence will populate on next Auto run (8am or 8pm EST).",
       "trend": "STABLE"
     }
   ],

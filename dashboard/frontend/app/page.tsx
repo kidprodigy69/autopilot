@@ -36,6 +36,10 @@ type Signal = {
   trend: "RISING" | "FALLING" | "STABLE";
   best_price_per_person: number | null;
   predicted_low_per_person: number | null;
+  typical_range_ppp: [number, number] | null;
+  price_level: "low" | "typical" | "high" | null;
+  aa_nonstop_count: number;
+  data_points: number;
 };
 
 type AutopilotData = {

@@ -2,7 +2,11 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plane, Clock, AlertCircle, ArrowLeftRight, Sunrise, Sunset, Ban } from "lucide-react";
+import {
+  Plane, Clock, AlertCircle, ArrowLeftRight,
+  Sunrise, Sunset, Ban, TrendingUp, TrendingDown, Minus,
+  BarChart2, Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 
@@ -24,6 +28,10 @@ type Signal = {
   trend: "RISING" | "FALLING" | "STABLE";
   best_price_per_person: number | null;
   predicted_low_per_person: number | null;
+  typical_range_ppp: [number, number] | null;
+  price_level: "low" | "typical" | "high" | null;
+  aa_nonstop_count: number;
+  data_points: number;
 };
 
 type Trip = {
@@ -52,17 +60,18 @@ const SIGNAL_CONFIG = {
   WAIT: { gradient: "from-sky-600 to-blue-500",       text: "text-sky-400",     bg: "bg-sky-500/20",     border: "border-sky-500/30",     glow: "rgba(14,165,233,0.4)" },
 };
 
+const LEVEL_CONFIG = {
+  low:     { label: "LOW",     color: "text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500/30", icon: TrendingDown },
+  typical: { label: "TYPICAL", color: "text-amber-400",   bg: "bg-amber-500/15",   border: "border-amber-500/30",   icon: Minus },
+  high:    { label: "HIGH",    color: "text-red-400",     bg: "bg-red-500/15",     border: "border-red-500/30",     icon: TrendingUp },
+};
+
 function SlotRow({
-  icon,
-  label,
-  slot,
-  passengers,
-  highlight,
+  icon, label, slot, highlight,
 }: {
   icon: React.ReactNode;
   label: string;
   slot: FlightSlot | null;
-  passengers: number;
   highlight?: boolean;
 }) {
   if (!slot || !slot.available) {
@@ -74,7 +83,7 @@ function SlotRow({
         </div>
         <div className="flex items-center gap-1.5 text-slate-600 text-xs">
           <Ban size={12} />
-          No nonstop AA flight
+          No nonstop AA
         </div>
       </div>
     );
@@ -83,9 +92,7 @@ function SlotRow({
   return (
     <div className={cn(
       "flex items-center justify-between px-4 py-3 rounded-xl border transition-colors",
-      highlight
-        ? "bg-emerald-500/8 border-emerald-500/25"
-        : "bg-slate-800/50 border-slate-700/50"
+      highlight ? "bg-emerald-500/8 border-emerald-500/25" : "bg-slate-800/50 border-slate-700/50"
     )}>
       <div className="flex items-center gap-3">
         {icon}
@@ -100,12 +107,25 @@ function SlotRow({
       <div className="text-right">
         <p className="text-xl font-black text-white tabular-nums">
           ${slot.price_per_person?.toFixed(0)}
+          <span className="text-xs font-normal text-slate-500 ml-1">/person</span>
         </p>
-        <p className="text-xs text-slate-500">per person</p>
         <p className="text-xs text-slate-600">${slot.price_total?.toFixed(0)} total</p>
       </div>
     </div>
   );
+}
+
+function ConfidenceLabel(confidence: number): string {
+  if (confidence < 0.40) return "Low";
+  if (confidence < 0.70) return "Med";
+  return "High";
+}
+
+function ConfidenceSubtext(confidence: number, dataPoints: number): string {
+  if (dataPoints < 5) return `${dataPoints} data pts — building history`;
+  if (confidence < 0.40) return "Early signal";
+  if (confidence < 0.70) return "Moderate data";
+  return "Strong signal";
 }
 
 export default function FlightMissionCard({ trip, morning, afternoon, signal, loading }: Props) {
@@ -116,13 +136,23 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
 
   const action = signal?.action ?? "WAIT";
   const cfg = SIGNAL_CONFIG[action];
-  const confidence = signal ? Math.round(signal.confidence * 100) : 0;
+  const confidence = signal ? signal.confidence : 0;
+  const confidencePct = Math.round(confidence * 100);
   const daysAway = signal?.days_to_depart ?? 0;
+  const dataPoints = signal?.data_points ?? 0;
 
-  // Highlight the cheaper slot
   const morningPPP = morning?.price_per_person ?? null;
   const afternoonPPP = afternoon?.price_per_person ?? null;
   const morningCheaper = morningPPP !== null && (afternoonPPP === null || morningPPP <= afternoonPPP);
+
+  const levelCfg = signal?.price_level ? LEVEL_CONFIG[signal.price_level] : null;
+  const LevelIcon = levelCfg?.icon ?? Minus;
+
+  const trendIcon = signal?.trend === "RISING"
+    ? <TrendingUp size={11} className="text-red-400" />
+    : signal?.trend === "FALLING"
+    ? <TrendingDown size={11} className="text-emerald-400" />
+    : <Minus size={11} className="text-slate-500" />;
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
@@ -141,7 +171,7 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
     };
   })();
 
-  if (loading) return <div className="rounded-2xl bg-slate-800/50 border border-slate-700/50 h-80 animate-pulse" />;
+  if (loading) return <div className="rounded-2xl bg-slate-800/50 border border-slate-700/50 h-96 animate-pulse" />;
 
   const departFmt = trip.depart_date ? format(parseISO(trip.depart_date), "MMM d") : "";
   const returnFmt = trip.return_date ? format(parseISO(trip.return_date), "MMM d, yyyy") : "";
@@ -172,8 +202,7 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
               <div key={i} className="absolute rounded-full bg-cyan-400/30" style={{
                 width: `${(i % 3) + 1}px`, height: `${(i % 3) + 1}px`,
                 top: `${(i * 17 + 7) % 100}%`, left: `${(i * 23 + 11) % 100}%`,
-                opacity: isHovered ? 0.6 : 0.2,
-                transition: "opacity 0.5s ease-out",
+                opacity: isHovered ? 0.6 : 0.2, transition: "opacity 0.5s ease-out",
                 boxShadow: "0 0 4px 1px rgba(6,182,212,0.3)",
               }} />
             ))}
@@ -181,6 +210,7 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
           <div className="absolute inset-0 backdrop-blur-sm bg-slate-900/40 border border-slate-700/50" />
 
           <div className="relative p-5 space-y-4">
+
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
@@ -189,6 +219,11 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                   <span className="text-xs text-cyan-500 font-semibold uppercase tracking-wider">
                     Nonstop · American · {trip.duration_days}d
                   </span>
+                  {signal?.aa_nonstop_count !== undefined && (
+                    <span className="text-xs text-slate-600">
+                      ({signal.aa_nonstop_count} AA flight{signal.aa_nonstop_count !== 1 ? "s" : ""})
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-white">{trip.origin}</span>
@@ -207,12 +242,28 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                   style={{ boxShadow: `0 0 16px ${cfg.glow}` }}>
                   <AlertCircle size={13} className={cfg.text} />
                   <span className={cn("text-sm font-black mt-0.5", cfg.text)}>{action}</span>
-                  <span className="text-xs text-slate-500">
-                    {confidence < 40 ? "Low" : confidence < 70 ? "Med" : "High"}
+                  <span className={cn("text-xs", cfg.text, "opacity-70")}>
+                    {ConfidenceLabel(confidence)}
                   </span>
                 </div>
               </motion.div>
             </div>
+
+            {/* Google Price Intel bar */}
+            {levelCfg && (
+              <div className={cn("flex items-center justify-between px-3 py-2 rounded-xl border", levelCfg.bg, levelCfg.border)}>
+                <div className="flex items-center gap-2">
+                  <BarChart2 size={13} className={levelCfg.color} />
+                  <span className="text-xs text-slate-400">Google rates this price:</span>
+                  <span className={cn("text-xs font-bold", levelCfg.color)}>{levelCfg.label}</span>
+                </div>
+                {signal?.typical_range_ppp && (
+                  <span className="text-xs text-slate-500">
+                    Typical ${signal.typical_range_ppp[0].toFixed(0)}–${signal.typical_range_ppp[1].toFixed(0)}/person
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Morning + Afternoon slots */}
             <div className="space-y-2">
@@ -220,48 +271,54 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                 icon={<Sunrise size={15} className="text-amber-400 flex-shrink-0" />}
                 label="Morning departure"
                 slot={morning}
-                passengers={trip.passengers}
                 highlight={morningCheaper && !!morningPPP}
               />
               <SlotRow
                 icon={<Sunset size={15} className="text-orange-400 flex-shrink-0" />}
                 label="Afternoon departure"
                 slot={afternoon}
-                passengers={trip.passengers}
                 highlight={!morningCheaper && !!afternoonPPP}
               />
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <div className="text-xs text-slate-400 mb-1">Signal Strength</div>
-                <div className="flex items-baseline gap-1">
-                  <span className={cn("text-xl font-bold", cfg.text)}>
-                    {confidence < 40 ? "Low" : confidence < 70 ? "Med" : "High"}
-                  </span>
-                  <span className="text-xs text-slate-600">{confidence}%</span>
-                </div>
-                <div className="mt-1.5 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div className="text-xs text-slate-400 mb-1">Signal</div>
+                <span className={cn("text-base font-bold", cfg.text)}>
+                  {ConfidenceLabel(confidence)}
+                </span>
+                <div className="mt-1.5 h-1 bg-slate-700 rounded-full overflow-hidden">
                   <motion.div
-                    initial={{ width: 0 }} animate={{ width: `${confidence}%` }}
+                    initial={{ width: 0 }} animate={{ width: `${confidencePct}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className={cn("h-full rounded-full bg-gradient-to-r", cfg.gradient)}
                   />
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
-                  {confidence < 40 ? "Building history" : confidence < 70 ? "Moderate data" : "Strong signal"}
-                </p>
+                <p className="text-xs text-slate-600 mt-1">{ConfidenceSubtext(confidence, dataPoints)}</p>
               </div>
+
               <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
                 <div className="text-xs text-slate-400 mb-1">Days Away</div>
-                <div className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-cyan-400" />
-                  <span className="text-xl font-bold text-white">{daysAway}</span>
+                <div className="flex items-center gap-1">
+                  <Clock size={13} className="text-cyan-400" />
+                  <span className="text-base font-bold text-white">{daysAway}</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-1">
                   {daysAway < 14 ? "Book now!" : daysAway < 45 ? "Sweet spot" : "Watch & wait"}
                 </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                <div className="text-xs text-slate-400 mb-1">Trend</div>
+                <div className="flex items-center gap-1">
+                  {trendIcon}
+                  <span className="text-base font-bold text-white">{signal?.trend ?? "—"}</span>
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <Users size={10} className="text-slate-600" />
+                  <p className="text-xs text-slate-600">{dataPoints} data pts</p>
+                </div>
               </div>
             </div>
 

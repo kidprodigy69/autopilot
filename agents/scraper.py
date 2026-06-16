@@ -1,7 +1,8 @@
 """
 Scraper Agent — round-trip price search via SerpAPI Google Flights.
 Filters: American Airlines only, nonstop only.
-Returns morning (5am-11:59am) and afternoon (12pm-5:59pm) departure slots separately.
+Returns morning (5am-11:59am) and afternoon (12pm-5:59pm) departure slots,
+plus Google's own price_insights (level, typical range, 30-day history).
 """
 import os
 import json
@@ -22,7 +23,7 @@ def load_config() -> dict:
 
 
 def _parse_hour(time_str: str) -> int | None:
-    """Parse '7:45 AM' → 7, '2:15 PM' → 14. Returns None on failure."""
+    """Parse '7:45 AM' → 7, '2:15 PM' → 14."""
     try:
         return datetime.strptime(time_str.strip(), "%I:%M %p").hour
     except Exception:
@@ -30,7 +31,6 @@ def _parse_hour(time_str: str) -> int | None:
 
 
 def _time_slot(time_str: str) -> str:
-    """Categorize departure time as morning, afternoon, or other."""
     hour = _parse_hour(time_str)
     if hour is None:
         return "other"
@@ -55,10 +55,47 @@ EMPTY_SLOT = {
 }
 
 
+def _parse_price_insights(raw_insights: dict, passengers: int) -> dict:
+    """
+    Extract and normalize Google's price intelligence.
+    Google stores price_history as [[epoch_ms, price_total], ...].
+    We convert to per-person and ISO timestamps.
+    """
+    if not raw_insights:
+        return {}
+
+    level = raw_insights.get("price_level")  # "low" | "typical" | "high"
+    typical = raw_insights.get("typical_range")  # [low_total, high_total]
+    lowest = raw_insights.get("lowest_price")    # total price
+
+    # Google's 30-day price history — [[epoch_ms, total_price], ...]
+    raw_history = raw_insights.get("price_history", [])
+    history_ppp = []
+    for entry in raw_history:
+        if isinstance(entry, list) and len(entry) == 2:
+            ts_ms, price_total = entry
+            try:
+                ts = datetime.utcfromtimestamp(ts_ms / 1000).isoformat()
+                history_ppp.append({
+                    "ts": ts,
+                    "price_per_person": round(float(price_total) / passengers, 2),
+                    "price_total": float(price_total),
+                })
+            except Exception:
+                continue
+
+    return {
+        "price_level": level,
+        "typical_range_ppp": [round(typical[0] / passengers, 2), round(typical[1] / passengers, 2)] if typical and len(typical) == 2 else None,
+        "lowest_ppp": round(lowest / passengers, 2) if lowest else None,
+        "google_history_ppp": history_ppp,  # ~30 data points, per-person
+    }
+
+
 async def fetch_trip_options(trip: dict) -> dict:
     """
-    Fetch nonstop American Airlines round-trip options for a trip.
-    Returns { morning: {...}, afternoon: {...} } with per-person pricing.
+    Fetch nonstop AA round-trip options.
+    Returns { morning, afternoon, price_insights, aa_nonstop_count }
     """
     api_key = os.getenv("SERPAPI_KEY")
     if not api_key:
@@ -84,101 +121,48 @@ async def fetch_trip_options(trip: dict) -> dict:
         resp.raise_for_status()
         raw = resp.json()
 
+    # Google's price intelligence (free with every response)
+    price_insights = _parse_price_insights(raw.get("price_insights", {}), trip["passengers"])
+
     slots: dict[str, dict] = {"morning": {}, "afternoon": {}}
+    aa_nonstop_count = 0
 
     all_flights = raw.get("best_flights", []) + raw.get("other_flights", [])
     for flight in all_flights:
         price_total = float(flight.get("price", 0))
         if price_total == 0:
             continue
-
         legs = flight.get("flights", [])
         if not legs:
             continue
 
-        # Outbound leg is always first
         outbound = legs[0]
         airline = outbound.get("airline", "")
-
-        # American only
         if not _is_american(airline):
             continue
 
+        aa_nonstop_count += 1
         depart_time = outbound.get("departure_airport", {}).get("time", "")
         slot = _time_slot(depart_time)
         if slot not in ("morning", "afternoon"):
             continue
 
-        # Keep cheapest per slot
         if not slots[slot] or price_total < slots[slot].get("price_total", float("inf")):
-            flight_number = outbound.get("flight_number", "")
             slots[slot] = {
                 "available": True,
                 "price_total": price_total,
                 "price_per_person": round(price_total / trip["passengers"], 2),
                 "depart_time": depart_time,
-                "flight_number": flight_number,
+                "flight_number": outbound.get("flight_number", ""),
                 "airline": airline,
             }
 
     return {
         "morning": slots["morning"] if slots["morning"] else EMPTY_SLOT.copy(),
         "afternoon": slots["afternoon"] if slots["afternoon"] else EMPTY_SLOT.copy(),
+        "price_insights": price_insights,
+        "aa_nonstop_count": aa_nonstop_count,
     }
-
-
-async def fetch_cheapest_dates(trip: dict) -> list[dict]:
-    """Check ±5 days (nonstop AA) — costs 10 API calls, run manually."""
-    api_key = os.getenv("SERPAPI_KEY")
-    if not api_key:
-        return []
-
-    depart = date.fromisoformat(trip["depart_date"])
-    duration = trip["duration_days"]
-    results = []
-
-    async with httpx.AsyncClient(timeout=20) as client:
-        for offset in range(-5, 6):
-            out = depart + timedelta(days=offset)
-            ret = out + timedelta(days=duration)
-            try:
-                resp = await client.get(
-                    SERPAPI_BASE,
-                    params={
-                        "engine": "google_flights",
-                        "api_key": api_key,
-                        "departure_id": trip["origin"],
-                        "arrival_id": trip["destination"],
-                        "outbound_date": out.isoformat(),
-                        "return_date": ret.isoformat(),
-                        "adults": trip["passengers"],
-                        "travel_class": _CABIN.get(trip["cabin_class"], 1),
-                        "currency": "USD",
-                        "hl": "en",
-                        "type": "1",
-                        "stops": "1",
-                    },
-                    timeout=15,
-                )
-                data = resp.json()
-                # Filter to American only
-                aa_flights = [
-                    f for f in (data.get("best_flights", []) + data.get("other_flights", []))
-                    if f.get("flights") and _is_american(f["flights"][0].get("airline", ""))
-                ]
-                if aa_flights:
-                    best = float(aa_flights[0].get("price", 0))
-                    if best > 0:
-                        results.append({
-                            "depart_date": out.isoformat(),
-                            "return_date": ret.isoformat(),
-                            "price": best,
-                            "price_per_person": round(best / trip["passengers"], 2),
-                        })
-            except Exception:
-                continue
-
-    return sorted(results, key=lambda x: x["price"])
 
 
 async def run_all_trips() -> dict:

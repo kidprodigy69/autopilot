@@ -11,7 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from agents.scraper import run_all_trips
-from agents.analyzer import record_prices, get_all_signals, get_price_chart_data
+from agents.analyzer import record_prices, seed_from_google, get_all_signals, get_price_chart_data
 from agents.reporter import check_and_alert
 
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
@@ -97,11 +97,20 @@ async def poll_cycle():
         options_map[trip_id] = opts
         morning_ppp = opts.get("morning", {}).get("price_per_person")
         afternoon_ppp = opts.get("afternoon", {}).get("price_per_person")
+        price_insights = opts.get("price_insights", {})
+        aa_count = opts.get("aa_nonstop_count", 0)
+
+        # Seed history from Google's 30-day data if we're just starting out
+        google_history = price_insights.get("google_history_ppp", [])
+        if google_history:
+            seed_from_google(trip_id, google_history)
+
         record_prices(trip_id, morning_ppp, afternoon_ppp)
 
         m_str = f"${morning_ppp:.0f}/person" if morning_ppp else "N/A"
         a_str = f"${afternoon_ppp:.0f}/person" if afternoon_ppp else "N/A"
-        print(f"[Tracker] {trip_id} → morning: {m_str}, afternoon: {a_str}")
+        level = price_insights.get("price_level", "?")
+        print(f"[Tracker] {trip_id} → morning: {m_str}, afternoon: {a_str}, Google: {level}, AA flights: {aa_count}")
 
     signals = get_all_signals(list(trips.values()), options_map)
     for sig in signals:
