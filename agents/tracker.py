@@ -1,7 +1,6 @@
 """
-Tracker Agent — polls SerpAPI for round-trip prices on schedule, records
-history, triggers analyzer + reporter, writes public JSON, and pushes to
-GitHub so Vercel auto-redeploys the live site.
+Tracker Agent — polls SerpAPI for nonstop AA round-trip prices (morning + afternoon),
+writes public JSON, emails alerts on drops, and pushes to GitHub for Vercel redeploy.
 """
 import asyncio
 import json
@@ -12,7 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from agents.scraper import run_all_trips
-from agents.analyzer import record_price, get_all_signals, get_price_chart_data
+from agents.analyzer import record_prices, get_all_signals, get_price_chart_data
 from agents.reporter import check_and_alert
 
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
@@ -36,23 +35,14 @@ def read_status() -> dict:
     return json.loads(STATUS_PATH.read_text())
 
 
-def write_public_data(config: dict, signals: list, current_prices: dict):
-    history = {}
-    best_offers = {}
-    for t in config["trips"]:
-        if not t.get("active"):
-            continue
-        history[t["id"]] = get_price_chart_data(t["id"])[-60:]
-        price = current_prices.get(t["id"])
-        if price:
-            best_offers[t["id"]] = {"price_total": price}
-
+def write_public_data(config: dict, signals: list, options_map: dict):
+    history = {t["id"]: get_price_chart_data(t["id"])[-60:] for t in config["trips"] if t.get("active")}
     payload = {
         "updated_at": datetime.utcnow().isoformat() + "Z",
         "trips": [t for t in config["trips"] if t.get("active")],
+        "flight_options": options_map,
         "signals": signals,
         "history": history,
-        "best_offers": best_offers,
     }
     PUBLIC_JSON.parent.mkdir(parents=True, exist_ok=True)
     PUBLIC_JSON.write_text(json.dumps(payload, indent=2))
@@ -68,11 +58,13 @@ def git_push():
             cwd=REPO_ROOT, check=True, capture_output=True,
         )
         if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=REPO_ROOT, capture_output=True).returncode == 0:
-            print("[Tracker] No data changes — skipping push.")
+            print("[Tracker] No price changes — skipping push.")
             return
         ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-        subprocess.run(["git", "commit", "-m", f"Auto: price update {ts}"], cwd=REPO_ROOT, check=True, capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], cwd=REPO_ROOT, check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"Auto: price update {ts}"],
+                       cwd=REPO_ROOT, check=True, capture_output=True)
+        subprocess.run(["git", "push", "origin", "main"],
+                       cwd=REPO_ROOT, check=True, capture_output=True)
         print("[Tracker] Pushed to GitHub → Vercel redeploy triggered.")
     except subprocess.CalledProcessError as e:
         print(f"[Tracker] Git push failed: {e.stderr.decode().strip()}")
@@ -93,31 +85,35 @@ async def poll_cycle():
         write_status(status)
         return
 
-    current_prices = {}
+    options_map = {}
     for trip_id, result in results.items():
-        if result.get("error") or not result["offers"]:
-            print(f"[Tracker] No offers for {trip_id}: {result.get('error')}")
+        if result.get("error"):
+            print(f"[Tracker] Error for {trip_id}: {result['error']}")
             continue
-        best = result["offers"][0]
-        price = best["price_total"]
-        airline = best.get("airline", "")
-        current_prices[trip_id] = price
-        record_price(trip_id, price, airline)
-        print(f"[Tracker] {trip_id} round-trip: ${price:.2f} via {airline}")
+        opts = result.get("options", {})
+        if not opts:
+            continue
 
-    signals = get_all_signals(list(trips.values()), current_prices)
+        options_map[trip_id] = opts
+        morning_ppp = opts.get("morning", {}).get("price_per_person")
+        afternoon_ppp = opts.get("afternoon", {}).get("price_per_person")
+        record_prices(trip_id, morning_ppp, afternoon_ppp)
 
+        m_str = f"${morning_ppp:.0f}/person" if morning_ppp else "N/A"
+        a_str = f"${afternoon_ppp:.0f}/person" if afternoon_ppp else "N/A"
+        print(f"[Tracker] {trip_id} → morning: {m_str}, afternoon: {a_str}")
+
+    signals = get_all_signals(list(trips.values()), options_map)
     for sig in signals:
         trip = trips[sig["trip_id"]]
-        check_and_alert(trip, sig["current_price"], sig)
+        check_and_alert(trip, sig, options_map.get(sig["trip_id"], {}))
 
-    write_public_data(config, signals, current_prices)
+    write_public_data(config, signals, options_map)
     git_push()
 
     status = read_status()
     status["last_run"] = datetime.utcnow().isoformat()
     status["runs"] = status.get("runs", 0) + 1
-    status["last_prices"] = current_prices
     write_status(status)
 
 

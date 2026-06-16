@@ -18,6 +18,15 @@ type Trip = {
   preferred_airlines: string[];
 };
 
+type FlightSlot = {
+  available: boolean;
+  price_total: number | null;
+  price_per_person: number | null;
+  depart_time: string | null;
+  flight_number: string | null;
+  airline: string | null;
+};
+
 type Signal = {
   trip_id: string;
   action: "BUY" | "HOLD" | "WAIT";
@@ -25,25 +34,24 @@ type Signal = {
   reasoning: string;
   days_to_depart: number;
   trend: "RISING" | "FALLING" | "STABLE";
-  current_price: number;
-  predicted_low: number;
-  predicted_high: number;
+  best_price_per_person: number | null;
+  predicted_low_per_person: number | null;
 };
 
 type AutopilotData = {
   updated_at: string | null;
   trips: Trip[];
   signals: Signal[];
-  history: Record<string, { ts: string; price: number }[]>;
-  best_offers: Record<string, { price_total: number }>;
+  flight_options: Record<string, { morning: FlightSlot; afternoon: FlightSlot }>;
+  history: Record<string, { ts: string; morning: number | null; afternoon: number | null }[]>;
 };
 
 const EMPTY: AutopilotData = {
   updated_at: null,
   trips: [],
   signals: [],
+  flight_options: {},
   history: {},
-  best_offers: {},
 };
 
 export default function Dashboard() {
@@ -70,11 +78,6 @@ export default function Dashboard() {
 
   const sigMap: Record<string, Signal> = {};
   for (const s of data.signals) sigMap[s.trip_id] = s;
-
-  const getPrevPrice = (tripId: string): number | null => {
-    const pts = data.history[tripId] ?? [];
-    return pts.length >= 2 ? pts[pts.length - 2].price : null;
-  };
 
   const activeTrips = data.trips ?? [];
 
@@ -120,56 +123,54 @@ export default function Dashboard() {
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
 
-        {/* Warming up state */}
         {!loading && !data.updated_at && (
           <div className="rounded-2xl border border-sky-900/30 bg-[#0a1628] p-10 text-center">
             <PlaneTakeoff size={32} className="text-sky-800 mx-auto mb-3" />
             <p className="text-slate-400 font-semibold">Auto is warming up</p>
             <p className="text-slate-600 text-sm mt-1">
-              First price check hasn't run yet. Start Auto locally to begin tracking.
+              First price check hasn&apos;t run yet. GitHub Actions will kick off at 8am or 8pm EST.
             </p>
           </div>
         )}
 
-        {/* Trip Cards */}
         {activeTrips.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
                 Trips Tracked
               </h2>
-              <span className="text-xs text-slate-600">Round-trip totals for 2 passengers</span>
+              <span className="text-xs text-slate-600">Nonstop · American Airlines · per person</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {activeTrips.map((t) => (
-                <FlightMissionCard
-                  key={t.id}
-                  trip={t}
-                  currentPrice={sigMap[t.id]?.current_price ?? data.best_offers[t.id]?.price_total ?? null}
-                  prevPrice={getPrevPrice(t.id)}
-                  signal={sigMap[t.id] ?? null}
-                  loading={loading}
-                />
-              ))}
+              {activeTrips.map((t) => {
+                const opts = data.flight_options[t.id];
+                return (
+                  <FlightMissionCard
+                    key={t.id}
+                    trip={t}
+                    morning={opts?.morning ?? null}
+                    afternoon={opts?.afternoon ?? null}
+                    signal={sigMap[t.id] ?? null}
+                    loading={loading}
+                  />
+                );
+              })}
             </div>
           </section>
         )}
 
-        {/* Price History Charts */}
         {activeTrips.length > 0 && (
           <section>
             <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-              Round-Trip Price History
+              Price History — Per Person
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeTrips.map((t) => (
                 <PriceChart
                   key={t.id}
-                  missionLabel={t.label}
+                  tripLabel={t.label}
                   points={data.history[t.id] ?? []}
-                  predictedLow={sigMap[t.id]?.predicted_low}
-                  predictedHigh={sigMap[t.id]?.predicted_high}
-                  currentPrice={sigMap[t.id]?.current_price}
+                  predictedLow={sigMap[t.id]?.predicted_low_per_person ?? undefined}
                 />
               ))}
             </div>
@@ -177,7 +178,7 @@ export default function Dashboard() {
         )}
 
         <footer className="text-center py-4 text-xs text-slate-700">
-          Auto checks round-trip prices every 12 hours · Alerts on drops to milesdailey19@gmail.com
+          Auto checks round-trip prices every 12 hours · Alerts on drops ≥5% to milesdailey19@gmail.com
         </footer>
       </main>
     </div>

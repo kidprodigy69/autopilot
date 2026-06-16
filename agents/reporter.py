@@ -121,9 +121,13 @@ def send_alert(trip: dict, signal: dict, new_price: float, drop_pct: float):
     print(f"[Reporter] Alert sent for {trip['id']} — ${new_price:.0f} ({drop_pct:.1f}% drop)")
 
 
-def check_and_alert(trip: dict, current_price: float, signal: dict):
+def check_and_alert(trip: dict, signal: dict, options: dict):
     config = load_config()
     threshold = config["autopilot"]["price_drop_threshold_pct"]
-    should_send, drop_pct = should_send_alert(trip["id"], current_price, threshold)
+    best_ppp = signal.get("best_price_per_person")
+    if best_ppp is None:
+        return
+    # Track alert on per-person basis
+    should_send, drop_pct = should_send_alert(trip["id"], best_ppp, threshold)
     if should_send:
-        send_alert(trip, signal, current_price, drop_pct)
+        send_alert(trip, signal, best_ppp * trip["passengers"], drop_pct)

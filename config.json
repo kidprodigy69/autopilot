@@ -22,7 +22,7 @@
       "cabin_class": "ECONOMY",
       "preferred_airlines": ["AA"],
       "max_price_total": 1200,
-      "nonstop_only": false,
+      "nonstop_only": true,
       "active": true
     },
     {
@@ -35,9 +35,9 @@
       "duration_days": 6,
       "passengers": 2,
       "cabin_class": "ECONOMY",
-      "preferred_airlines": [],
+      "preferred_airlines": ["AA"],
       "max_price_total": 1200,
-      "nonstop_only": false,
+      "nonstop_only": true,
       "active": true
     }
   ],
