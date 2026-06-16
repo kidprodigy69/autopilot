@@ -10,13 +10,17 @@ import {
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 
-type FlightSlot = {
-  available: boolean;
-  price_total: number | null;
-  price_per_person: number | null;
-  depart_time: string | null;
-  flight_number: string | null;
-  airline: string | null;
+type FlightOption = {
+  available: true;
+  price_total: number;
+  price_per_person: number;
+  depart_time: string;
+  arrive_time: string;
+  flight_number: string;
+  airline: string;
+  return_flight_number: string | null;
+  return_depart_time: string | null;
+  return_arrive_time: string | null;
 };
 
 type Signal = {
@@ -48,8 +52,8 @@ type Trip = {
 
 type Props = {
   trip: Trip;
-  morning: FlightSlot | null;
-  afternoon: FlightSlot | null;
+  morning: FlightOption[];
+  afternoon: FlightOption[];
   signal: Signal | null;
   loading?: boolean;
 };
@@ -66,17 +70,16 @@ const LEVEL_CONFIG = {
   high:    { label: "HIGH",    color: "text-red-400",     bg: "bg-red-500/15",     border: "border-red-500/30",     icon: TrendingUp },
 };
 
-function SlotRow({
-  icon, label, slot, highlight,
+function SlotSection({
+  icon, label, flights,
 }: {
   icon: React.ReactNode;
   label: string;
-  slot: FlightSlot | null;
-  highlight?: boolean;
+  flights: FlightOption[];
 }) {
-  if (!slot || !slot.available) {
+  if (!flights.length) {
     return (
-      <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-slate-900/40 border border-slate-800/60">
+      <div className="rounded-xl bg-slate-900/40 border border-slate-800/60 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {icon}
           <span className="text-sm text-slate-500">{label}</span>
@@ -90,26 +93,67 @@ function SlotRow({
   }
 
   return (
-    <div className={cn(
-      "flex items-center justify-between px-4 py-3 rounded-xl border transition-colors",
-      highlight ? "bg-emerald-500/8 border-emerald-500/25" : "bg-slate-800/50 border-slate-700/50"
-    )}>
-      <div className="flex items-center gap-3">
+    <div className="rounded-xl border border-slate-700/50 overflow-hidden">
+      {/* Slot header */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/70 border-b border-slate-700/50">
         {icon}
-        <div>
-          <p className="text-xs text-slate-400">{label}</p>
-          <p className="text-white font-semibold text-sm">{slot.depart_time}</p>
-          {slot.flight_number && (
-            <p className="text-xs text-slate-600 font-mono">{slot.flight_number}</p>
-          )}
-        </div>
+        <span className="text-xs font-semibold text-slate-400">{label}</span>
+        <span className="text-xs text-slate-600 ml-auto">{flights.length} option{flights.length !== 1 ? "s" : ""}</span>
       </div>
-      <div className="text-right">
-        <p className="text-xl font-black text-white tabular-nums">
-          ${slot.price_per_person?.toFixed(0)}
-          <span className="text-xs font-normal text-slate-500 ml-1">/person</span>
-        </p>
-        <p className="text-xs text-slate-600">${slot.price_total?.toFixed(0)} total</p>
+
+      {/* Flight rows */}
+      <div className="divide-y divide-slate-800/60">
+        {flights.map((f, i) => (
+          <div
+            key={f.flight_number || i}
+            className={cn(
+              "flex items-center gap-3 px-4 py-2.5",
+              i === 0 ? "bg-emerald-500/5" : "bg-slate-900/30"
+            )}
+          >
+            {/* Cheapest badge */}
+            <div className="w-5 flex-shrink-0">
+              {i === 0 && flights.length > 1 && (
+                <span className="text-emerald-400 text-xs">★</span>
+              )}
+            </div>
+
+            {/* Flight number */}
+            <div className="w-16 flex-shrink-0">
+              <p className="text-xs font-mono font-bold text-white">{f.flight_number || "—"}</p>
+              {f.return_flight_number && (
+                <p className="text-xs font-mono text-slate-600">{f.return_flight_number}</p>
+              )}
+            </div>
+
+            {/* Times */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold text-white tabular-nums">{f.depart_time}</span>
+                <span className="text-slate-600 text-xs">→</span>
+                <span className="text-sm text-slate-300 tabular-nums">{f.arrive_time}</span>
+                <span className="text-slate-600 text-xs ml-1">outbound</span>
+              </div>
+              {f.return_depart_time && (
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-xs text-slate-500 tabular-nums">{f.return_depart_time}</span>
+                  <span className="text-slate-700 text-xs">→</span>
+                  <span className="text-xs text-slate-500 tabular-nums">{f.return_arrive_time}</span>
+                  <span className="text-slate-700 text-xs ml-1">return</span>
+                </div>
+              )}
+            </div>
+
+            {/* Price */}
+            <div className="text-right flex-shrink-0">
+              <p className={cn("text-sm font-black tabular-nums", i === 0 ? "text-white" : "text-slate-400")}>
+                ${f.price_per_person.toFixed(0)}
+                <span className="text-xs font-normal text-slate-500">/pp</span>
+              </p>
+              <p className="text-xs text-slate-600">${f.price_total.toFixed(0)} total</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -141,9 +185,8 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
   const daysAway = signal?.days_to_depart ?? 0;
   const dataPoints = signal?.data_points ?? 0;
 
-  const morningPPP = morning?.price_per_person ?? null;
-  const afternoonPPP = afternoon?.price_per_person ?? null;
-  const morningCheaper = morningPPP !== null && (afternoonPPP === null || morningPPP <= afternoonPPP);
+  const morningPPP = morning[0]?.price_per_person ?? null;
+  const afternoonPPP = afternoon[0]?.price_per_person ?? null;
 
   const levelCfg = signal?.price_level ? LEVEL_CONFIG[signal.price_level] : null;
   const LevelIcon = levelCfg?.icon ?? Minus;
@@ -267,17 +310,15 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
 
             {/* Morning + Afternoon slots */}
             <div className="space-y-2">
-              <SlotRow
-                icon={<Sunrise size={15} className="text-amber-400 flex-shrink-0" />}
-                label="Morning departure"
-                slot={morning}
-                highlight={morningCheaper && !!morningPPP}
+              <SlotSection
+                icon={<Sunrise size={14} className="text-amber-400 flex-shrink-0" />}
+                label="Morning departures (5am–noon)"
+                flights={morning}
               />
-              <SlotRow
-                icon={<Sunset size={15} className="text-orange-400 flex-shrink-0" />}
-                label="Afternoon departure"
-                slot={afternoon}
-                highlight={!morningCheaper && !!afternoonPPP}
+              <SlotSection
+                icon={<Sunset size={14} className="text-orange-400 flex-shrink-0" />}
+                label="Afternoon departures (noon–6pm)"
+                flights={afternoon}
               />
             </div>
 

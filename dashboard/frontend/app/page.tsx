@@ -18,13 +18,17 @@ type Trip = {
   preferred_airlines: string[];
 };
 
-type FlightSlot = {
-  available: boolean;
-  price_total: number | null;
-  price_per_person: number | null;
-  depart_time: string | null;
-  flight_number: string | null;
-  airline: string | null;
+type FlightOption = {
+  available: true;
+  price_total: number;
+  price_per_person: number;
+  depart_time: string;
+  arrive_time: string;
+  flight_number: string;
+  airline: string;
+  return_flight_number: string | null;
+  return_depart_time: string | null;
+  return_arrive_time: string | null;
 };
 
 type Signal = {
@@ -46,7 +50,7 @@ type AutopilotData = {
   updated_at: string | null;
   trips: Trip[];
   signals: Signal[];
-  flight_options: Record<string, { morning: FlightSlot; afternoon: FlightSlot }>;
+  flight_options: Record<string, { morning: FlightOption[]; afternoon: FlightOption[] }>;
   history: Record<string, { ts: string; morning: number | null; afternoon: number | null }[]>;
 };
 
@@ -157,8 +161,8 @@ export default function Dashboard() {
                   <FlightMissionCard
                     key={t.id}
                     trip={t}
-                    morning={opts?.morning ?? null}
-                    afternoon={opts?.afternoon ?? null}
+                    morning={opts?.morning ?? []}
+                    afternoon={opts?.afternoon ?? []}
                     signal={sigMap[t.id] ?? null}
                     loading={loading}
                   />

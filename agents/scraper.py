@@ -45,14 +45,6 @@ def _is_american(airline_name: str) -> bool:
     return "american" in airline_name.lower()
 
 
-EMPTY_SLOT = {
-    "available": False,
-    "price_total": None,
-    "price_per_person": None,
-    "depart_time": None,
-    "flight_number": None,
-    "airline": None,
-}
 
 
 def _parse_price_insights(raw_insights: dict, passengers: int) -> dict:
@@ -124,7 +116,8 @@ async def fetch_trip_options(trip: dict) -> dict:
     # Google's price intelligence (free with every response)
     price_insights = _parse_price_insights(raw.get("price_insights", {}), trip["passengers"])
 
-    slots: dict[str, dict] = {"morning": {}, "afternoon": {}}
+    # Collect all AA nonstop flights, grouped by time slot
+    slots: dict[str, list] = {"morning": [], "afternoon": []}
     aa_nonstop_count = 0
 
     all_flights = raw.get("best_flights", []) + raw.get("other_flights", [])
@@ -143,23 +136,35 @@ async def fetch_trip_options(trip: dict) -> dict:
 
         aa_nonstop_count += 1
         depart_time = outbound.get("departure_airport", {}).get("time", "")
+        arrive_time = outbound.get("arrival_airport", {}).get("time", "")
         slot = _time_slot(depart_time)
         if slot not in ("morning", "afternoon"):
             continue
 
-        if not slots[slot] or price_total < slots[slot].get("price_total", float("inf")):
-            slots[slot] = {
-                "available": True,
-                "price_total": price_total,
-                "price_per_person": round(price_total / trip["passengers"], 2),
-                "depart_time": depart_time,
-                "flight_number": outbound.get("flight_number", ""),
-                "airline": airline,
-            }
+        # Return leg is legs[1] for nonstop round trips (when SerpAPI includes it)
+        return_leg = legs[1] if len(legs) > 1 else None
+
+        slots[slot].append({
+            "available": True,
+            "price_total": price_total,
+            "price_per_person": round(price_total / trip["passengers"], 2),
+            "depart_time": depart_time,
+            "arrive_time": arrive_time,
+            "flight_number": outbound.get("flight_number", ""),
+            "airline": airline,
+            # Return leg details if SerpAPI includes them
+            "return_flight_number": return_leg.get("flight_number") if return_leg else None,
+            "return_depart_time": return_leg.get("departure_airport", {}).get("time") if return_leg else None,
+            "return_arrive_time": return_leg.get("arrival_airport", {}).get("time") if return_leg else None,
+        })
+
+    # Sort each slot cheapest first
+    for s in slots:
+        slots[s].sort(key=lambda x: x["price_total"])
 
     return {
-        "morning": slots["morning"] if slots["morning"] else EMPTY_SLOT.copy(),
-        "afternoon": slots["afternoon"] if slots["afternoon"] else EMPTY_SLOT.copy(),
+        "morning": slots["morning"],    # [] = no flights that slot
+        "afternoon": slots["afternoon"],
         "price_insights": price_insights,
         "aa_nonstop_count": aa_nonstop_count,
     }

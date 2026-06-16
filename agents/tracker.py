@@ -95,8 +95,10 @@ async def poll_cycle():
             continue
 
         options_map[trip_id] = opts
-        morning_ppp = opts.get("morning", {}).get("price_per_person")
-        afternoon_ppp = opts.get("afternoon", {}).get("price_per_person")
+        morning_list = opts.get("morning", [])
+        afternoon_list = opts.get("afternoon", [])
+        morning_ppp = morning_list[0].get("price_per_person") if morning_list else None
+        afternoon_ppp = afternoon_list[0].get("price_per_person") if afternoon_list else None
         price_insights = opts.get("price_insights", {})
         aa_count = opts.get("aa_nonstop_count", 0)
 

@@ -273,8 +273,10 @@ def get_all_signals(trips: list[dict], options_map: dict) -> list[dict]:
         if not t.get("active"):
             continue
         opts = options_map.get(t["id"], {})
-        morning_ppp = opts.get("morning", {}).get("price_per_person")
-        afternoon_ppp = opts.get("afternoon", {}).get("price_per_person")
+        morning_list = opts.get("morning", [])
+        afternoon_list = opts.get("afternoon", [])
+        morning_ppp = morning_list[0].get("price_per_person") if morning_list else None
+        afternoon_ppp = afternoon_list[0].get("price_per_person") if afternoon_list else None
         price_insights = opts.get("price_insights", {})
         aa_count = opts.get("aa_nonstop_count", 0)
         sig = analyze_trip(

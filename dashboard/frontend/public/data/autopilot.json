@@ -32,22 +32,21 @@
   ],
   "flight_options": {
     "traverse_city": {
-      "morning": {
-        "available": true,
-        "price_total": 1129.0,
-        "price_per_person": 564.5,
-        "depart_time": "—",
-        "flight_number": null,
-        "airline": "American Airlines"
-      },
-      "afternoon": {
-        "available": false,
-        "price_total": null,
-        "price_per_person": null,
-        "depart_time": null,
-        "flight_number": null,
-        "airline": null
-      },
+      "morning": [
+        {
+          "available": true,
+          "price_total": 1129.0,
+          "price_per_person": 564.5,
+          "depart_time": "Awaiting live data",
+          "arrive_time": "—",
+          "flight_number": "AA —",
+          "airline": "American Airlines",
+          "return_flight_number": null,
+          "return_depart_time": null,
+          "return_arrive_time": null
+        }
+      ],
+      "afternoon": [],
       "price_insights": {
         "price_level": null,
         "typical_range_ppp": null,
@@ -57,22 +56,21 @@
       "aa_nonstop_count": 1
     },
     "orlando": {
-      "morning": {
-        "available": true,
-        "price_total": 734.0,
-        "price_per_person": 367.0,
-        "depart_time": "—",
-        "flight_number": null,
-        "airline": "American Airlines"
-      },
-      "afternoon": {
-        "available": false,
-        "price_total": null,
-        "price_per_person": null,
-        "depart_time": null,
-        "flight_number": null,
-        "airline": null
-      },
+      "morning": [
+        {
+          "available": true,
+          "price_total": 734.0,
+          "price_per_person": 367.0,
+          "depart_time": "Awaiting live data",
+          "arrive_time": "—",
+          "flight_number": "AA —",
+          "airline": "American Airlines",
+          "return_flight_number": null,
+          "return_depart_time": null,
+          "return_arrive_time": null
+        }
+      ],
+      "afternoon": [],
       "price_insights": {
         "price_level": null,
         "typical_range_ppp": null,
@@ -94,7 +92,7 @@
       "aa_nonstop_count": 1,
       "data_points": 1,
       "days_to_depart": 64,
-      "reasoning": "Awaiting first live poll — Google price data and route intelligence will populate on next Auto run (8am or 8pm EST).",
+      "reasoning": "Awaiting first live poll — flight times, Google price data, and route intelligence populate on next Auto run (8am or 8pm EST).",
       "trend": "STABLE"
     },
     {
@@ -108,7 +106,7 @@
       "aa_nonstop_count": 1,
       "data_points": 1,
       "days_to_depart": 174,
-      "reasoning": "Awaiting first live poll — Google price data and route intelligence will populate on next Auto run (8am or 8pm EST).",
+      "reasoning": "Awaiting first live poll — flight times, Google price data, and route intelligence populate on next Auto run (8am or 8pm EST).",
       "trend": "STABLE"
     }
   ],
