@@ -1,0 +1,70 @@
+{
+  "autopilot": {
+    "name": "Auto",
+    "version": "1.0.0",
+    "check_interval_minutes": 720,
+    "alert_emails": [
+      "milesdailey19@gmail.com",
+      "onyxmediagroupclt@gmail.com"
+    ],
+    "price_drop_threshold_pct": 5
+  },
+  "missions": [
+    {
+      "id": "tvc_out",
+      "label": "Charlotte → Traverse City",
+      "origin": "CLT",
+      "destination": "TVC",
+      "depart_date": "2026-08-19",
+      "passengers": 2,
+      "cabin_class": "ECONOMY",
+      "preferred_airlines": ["AA"],
+      "max_price_per_person": 400,
+      "nonstop_only": false,
+      "active": true
+    },
+    {
+      "id": "tvc_ret",
+      "label": "Traverse City → Charlotte",
+      "origin": "TVC",
+      "destination": "CLT",
+      "depart_date": "2026-08-23",
+      "passengers": 2,
+      "cabin_class": "ECONOMY",
+      "preferred_airlines": ["AA"],
+      "max_price_per_person": 400,
+      "nonstop_only": false,
+      "active": true
+    },
+    {
+      "id": "mco_out",
+      "label": "Charlotte → Orlando",
+      "origin": "CLT",
+      "destination": "MCO",
+      "depart_date": "2026-12-07",
+      "passengers": 2,
+      "cabin_class": "ECONOMY",
+      "preferred_airlines": [],
+      "max_price_per_person": 400,
+      "nonstop_only": false,
+      "active": true
+    },
+    {
+      "id": "mco_ret",
+      "label": "Orlando → Charlotte",
+      "origin": "MCO",
+      "destination": "CLT",
+      "depart_date": "2026-12-13",
+      "passengers": 2,
+      "cabin_class": "ECONOMY",
+      "preferred_airlines": [],
+      "max_price_per_person": 400,
+      "nonstop_only": false,
+      "active": true
+    }
+  ],
+  "serpapi": {
+    "base_url": "https://serpapi.com/search",
+    "note": "Free plan: 250 searches/month. 4 flights x 2 checks/day x 30 days = 240/month."
+  }
+}
