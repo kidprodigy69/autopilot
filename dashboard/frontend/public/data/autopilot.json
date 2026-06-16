@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-16T04:39:45.557829Z",
+  "updated_at": "2026-06-16T18:06:45.280402Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -11,7 +11,10 @@
       "duration_days": 5,
       "passengers": 2,
       "cabin_class": "ECONOMY",
-      "preferred_airlines": ["AA"],
+      "preferred_airlines": [
+        "AA"
+      ],
+      "max_price_total": 1200,
       "nonstop_only": true,
       "active": true
     },
@@ -25,88 +28,65 @@
       "duration_days": 6,
       "passengers": 2,
       "cabin_class": "ECONOMY",
-      "preferred_airlines": ["AA"],
+      "preferred_airlines": [
+        "AA"
+      ],
+      "max_price_total": 1200,
       "nonstop_only": true,
       "active": true
     }
   ],
   "flight_options": {
     "traverse_city": {
-      "morning": [
-        {
-          "available": true,
-          "price_total": 1129.0,
-          "price_per_person": 564.5,
-          "depart_time": "Awaiting live data",
-          "arrive_time": "—",
-          "flight_number": "AA —",
-          "airline": "American Airlines",
-          "return_flight_number": null,
-          "return_depart_time": null,
-          "return_arrive_time": null
-        }
-      ],
+      "morning": [],
       "afternoon": [],
       "price_insights": {
-        "price_level": null,
+        "price_level": "typical",
         "typical_range_ppp": null,
-        "lowest_ppp": null,
+        "lowest_ppp": 632.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1
     },
     "orlando": {
-      "morning": [
-        {
-          "available": true,
-          "price_total": 734.0,
-          "price_per_person": 367.0,
-          "depart_time": "Awaiting live data",
-          "arrive_time": "—",
-          "flight_number": "AA —",
-          "airline": "American Airlines",
-          "return_flight_number": null,
-          "return_depart_time": null,
-          "return_arrive_time": null
-        }
-      ],
+      "morning": [],
       "afternoon": [],
       "price_insights": {
-        "price_level": null,
+        "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": null,
+        "lowest_ppp": 495.0,
         "google_history_ppp": []
       },
-      "aa_nonstop_count": 1
+      "aa_nonstop_count": 12
     }
   },
   "signals": [
     {
       "trip_id": "traverse_city",
       "action": "WAIT",
-      "confidence": 0.35,
-      "best_price_per_person": 564.5,
-      "predicted_low_per_person": 508.05,
+      "confidence": 0.25,
+      "best_price_per_person": null,
+      "predicted_low_per_person": null,
       "typical_range_ppp": null,
-      "price_level": null,
-      "aa_nonstop_count": 1,
-      "data_points": 1,
+      "price_level": "typical",
+      "aa_nonstop_count": 0,
       "days_to_depart": 64,
-      "reasoning": "Awaiting first live poll — flight times, Google price data, and route intelligence populate on next Auto run (8am or 8pm EST).",
+      "data_points": 1,
+      "reasoning": "No nonstop American Airlines flights found for these dates. Check back \u2014 availability opens closer to departure.",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
-      "confidence": 0.35,
-      "best_price_per_person": 367.0,
-      "predicted_low_per_person": 330.3,
+      "confidence": 0.25,
+      "best_price_per_person": null,
+      "predicted_low_per_person": null,
       "typical_range_ppp": null,
-      "price_level": null,
-      "aa_nonstop_count": 1,
-      "data_points": 1,
+      "price_level": "high",
+      "aa_nonstop_count": 0,
       "days_to_depart": 174,
-      "reasoning": "Awaiting first live poll — flight times, Google price data, and route intelligence populate on next Auto run (8am or 8pm EST).",
+      "data_points": 1,
+      "reasoning": "No nonstop American Airlines flights found for these dates. Check back \u2014 availability opens closer to departure.",
       "trend": "STABLE"
     }
   ],
