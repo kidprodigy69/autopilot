@@ -58,7 +58,7 @@
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
-      "aa_booking_url": "https://www.aa.com/booking/choose-flights/1.do?B_DATE=08%2F19%2F26&RETURN_DATE=08%2F23%2F26&ORIGIN=CLT&DESTINATION=TVC&ADULTS=2&TRIP_TYPE=R&CLASS=COACH&FLEX=2&SEGMENTS=1"
+      "aa_booking_url": "https://www.google.com/travel/flights?hl=en#flt=CLT.TVC.2026-08-19*TVC.CLT.2026-08-23;c:USD;e:1;sd:1;t:f"
     },
     "orlando": {
       "morning": [
@@ -192,7 +192,7 @@
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
-      "aa_booking_url": "https://www.aa.com/booking/choose-flights/1.do?B_DATE=12%2F05%2F26&RETURN_DATE=12%2F13%2F26&ORIGIN=CLT&DESTINATION=MCO&ADULTS=2&TRIP_TYPE=R&CLASS=COACH&FLEX=2&SEGMENTS=1"
+      "aa_booking_url": "https://www.google.com/travel/flights?hl=en#flt=CLT.MCO.2026-12-05*MCO.CLT.2026-12-13;c:USD;e:1;sd:1;t:f"
     }
   },
   "signals": [

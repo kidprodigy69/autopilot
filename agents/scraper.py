@@ -236,27 +236,19 @@ async def fetch_trip_options(trip: dict, debug: bool = False) -> dict:
 
     print(f"[Scraper] {trip['id']}: {aa_nonstop_count} AA nonstop → morning:{len(slots['morning'])} afternoon:{len(slots['afternoon'])}")
 
-    # AA.com booking URL — use their stable choose-flights endpoint.
-    # Their newer SPA hash routing (/booking/search#/roundTrip/...) returns 404
-    # because the server doesn't serve the SPA from that path.
-    # The /booking/choose-flights/1.do endpoint is server-side and stable.
-    # Dates in MM/DD/YY format, URL-encoded slashes.
-    def _aa_date(iso: str) -> str:
-        d = datetime.strptime(iso, "%Y-%m-%d")
-        return f"{d.month:02d}%2F{d.day:02d}%2F{str(d.year)[2:]}"
-
-    cabin_code = {"ECONOMY": "COACH", "PREMIUM_ECONOMY": "PREMIUM_ECONOMY", "BUSINESS": "BUSINESS", "FIRST": "FIRST"}.get(trip.get("cabin_class", "ECONOMY"), "COACH")
+    # Google Flights pre-filled search URL.
+    # AA.com has no public deep-link format that works without server-side session state:
+    #   - /booking/search#/roundTrip/... → 404 (SPA not served from that path)
+    #   - /booking/choose-flights/1.do → session-timeout (expects an active booking session)
+    # Google Flights is reliable, shows live prices, and "Book with American Airlines"
+    # takes the user directly to AA.com checkout for that specific flight.
+    cabin_num = {"ECONOMY": 1, "PREMIUM_ECONOMY": 2, "BUSINESS": 3, "FIRST": 4}.get(trip.get("cabin_class", "ECONOMY"), 1)
     aa_booking_url = (
-        f"https://www.aa.com/booking/choose-flights/1.do"
-        f"?B_DATE={_aa_date(trip['depart_date'])}"
-        f"&RETURN_DATE={_aa_date(trip['return_date'])}"
-        f"&ORIGIN={trip['origin']}"
-        f"&DESTINATION={trip['destination']}"
-        f"&ADULTS={trip['passengers']}"
-        f"&TRIP_TYPE=R"
-        f"&CLASS={cabin_code}"
-        f"&FLEX=2"
-        f"&SEGMENTS=1"
+        f"https://www.google.com/travel/flights"
+        f"?hl=en"
+        f"#flt={trip['origin']}.{trip['destination']}.{trip['depart_date']}"
+        f"*{trip['destination']}.{trip['origin']}.{trip['return_date']}"
+        f";c:USD;e:{cabin_num};sd:1;t:f"
     )
 
     return {
