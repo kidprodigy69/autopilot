@@ -57,7 +57,8 @@
         "lowest_ppp": 564.5,
         "google_history_ppp": []
       },
-      "aa_nonstop_count": 1
+      "aa_nonstop_count": 1,
+      "aa_booking_url": "https://www.aa.com/booking/search#/roundTrip/CLT/TVC/2026-08-19/2026-08-23/2/0/0/Economy/false"
     },
     "orlando": {
       "morning": [
@@ -190,7 +191,8 @@
         "lowest_ppp": 361.5,
         "google_history_ppp": []
       },
-      "aa_nonstop_count": 12
+      "aa_nonstop_count": 12,
+      "aa_booking_url": "https://www.aa.com/booking/search#/roundTrip/CLT/MCO/2026-12-05/2026-12-13/2/0/0/Economy/false"
     }
   },
   "signals": [

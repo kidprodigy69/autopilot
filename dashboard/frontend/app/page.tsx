@@ -50,7 +50,7 @@ type AutopilotData = {
   updated_at: string | null;
   trips: Trip[];
   signals: Signal[];
-  flight_options: Record<string, { morning: FlightOption[]; afternoon: FlightOption[] }>;
+  flight_options: Record<string, { morning: FlightOption[]; afternoon: FlightOption[]; aa_booking_url?: string }>;
   history: Record<string, { ts: string; morning: number | null; afternoon: number | null }[]>;
 };
 
@@ -165,6 +165,7 @@ export default function Dashboard() {
                     afternoon={opts?.afternoon ?? []}
                     signal={sigMap[t.id] ?? null}
                     loading={loading}
+                    aaBookingUrl={opts?.aa_booking_url}
                   />
                 );
               })}

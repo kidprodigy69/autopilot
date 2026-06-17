@@ -56,6 +56,7 @@ type Props = {
   afternoon: FlightOption[];
   signal: Signal | null;
   loading?: boolean;
+  aaBookingUrl?: string;
 };
 
 const SIGNAL_CONFIG = {
@@ -159,20 +160,31 @@ function SlotSection({
   );
 }
 
-function ConfidenceLabel(confidence: number): string {
-  if (confidence < 0.40) return "Low";
-  if (confidence < 0.70) return "Med";
-  return "High";
+// ── Categorical interpreters — each number gets a defined meaning ──────────
+
+function trackRecord(dataPoints: number): { label: string; sub: string } {
+  if (dataPoints < 3)  return { label: "New",      sub: `${dataPoints} check${dataPoints !== 1 ? "s" : ""} — no pattern yet` };
+  if (dataPoints < 10) return { label: "Building",  sub: `${dataPoints} checks — early trends forming` };
+  if (dataPoints < 20) return { label: "Pattern",   sub: `${dataPoints} checks — confident signal` };
+  if (dataPoints < 40) return { label: "Reliable",  sub: `${dataPoints} checks — ~30 days of data` };
+  return               { label: "Proven",    sub: `${dataPoints} checks — full track record` };
 }
 
-function ConfidenceSubtext(confidence: number, dataPoints: number): string {
-  if (dataPoints < 5) return `${dataPoints} data pts — building history`;
-  if (confidence < 0.40) return "Early signal";
-  if (confidence < 0.70) return "Moderate data";
-  return "Strong signal";
+function bookingWindow(daysAway: number): { label: string; sub: string; color: string } {
+  if (daysAway < 7)   return { label: "Last Chance",  sub: `${daysAway}d left — book immediately`,         color: "text-red-400" };
+  if (daysAway < 21)  return { label: "Book Now",     sub: `${daysAway}d left — prices rising fast`,       color: "text-orange-400" };
+  if (daysAway < 60)  return { label: "Sweet Spot",   sub: `${daysAway}d out — ideal booking window`,     color: "text-emerald-400" };
+  if (daysAway < 120) return { label: "Early Window", sub: `${daysAway}d out — ok to book, may drop`,     color: "text-cyan-400" };
+  return               { label: "Too Early",   sub: `${daysAway}d out — watch, don't book yet`,    color: "text-slate-400" };
 }
 
-export default function FlightMissionCard({ trip, morning, afternoon, signal, loading }: Props) {
+function priceDirection(trend: string): { label: string; sub: string; color: string } {
+  if (trend === "RISING")  return { label: "↑ Rising",  sub: "Prices going up — act sooner",     color: "text-red-400" };
+  if (trend === "FALLING") return { label: "↓ Falling", sub: "Prices trending down — watch it",  color: "text-emerald-400" };
+  return                          { label: "→ Flat",    sub: "Prices stable — no rush signal",    color: "text-slate-400" };
+}
+
+export default function FlightMissionCard({ trip, morning, afternoon, signal, loading, aaBookingUrl }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -286,7 +298,7 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                   <AlertCircle size={13} className={cfg.text} />
                   <span className={cn("text-sm font-black mt-0.5", cfg.text)}>{action}</span>
                   <span className={cn("text-xs", cfg.text, "opacity-70")}>
-                    {ConfidenceLabel(confidence)}
+                    {trackRecord(dataPoints).label}
                   </span>
                 </div>
               </motion.div>
@@ -322,45 +334,46 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
               />
             </div>
 
-            {/* Stats row */}
+            {/* Stats row — every number has a defined category */}
             <div className="grid grid-cols-3 gap-2">
-              <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <div className="text-xs text-slate-400 mb-1">Signal</div>
-                <span className={cn("text-base font-bold", cfg.text)}>
-                  {ConfidenceLabel(confidence)}
-                </span>
-                <div className="mt-1.5 h-1 bg-slate-700 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }} animate={{ width: `${confidencePct}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className={cn("h-full rounded-full bg-gradient-to-r", cfg.gradient)}
-                  />
-                </div>
-                <p className="text-xs text-slate-600 mt-1">{ConfidenceSubtext(confidence, dataPoints)}</p>
-              </div>
+              {/* Tile 1: Track Record — replaces opaque confidence % */}
+              {(() => {
+                const tr = trackRecord(dataPoints);
+                return (
+                  <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <div className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Track Record</div>
+                    <span className={cn("text-sm font-bold", cfg.text)}>{tr.label}</span>
+                    <p className="text-xs text-slate-600 mt-1 leading-snug">{tr.sub}</p>
+                  </div>
+                );
+              })()}
 
-              <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <div className="text-xs text-slate-400 mb-1">Days Away</div>
-                <div className="flex items-center gap-1">
-                  <Clock size={13} className="text-cyan-400" />
-                  <span className="text-base font-bold text-white">{daysAway}</span>
-                </div>
-                <p className="text-xs text-slate-500 mt-1">
-                  {daysAway < 14 ? "Book now!" : daysAway < 45 ? "Sweet spot" : "Watch & wait"}
-                </p>
-              </div>
+              {/* Tile 2: Booking Window — replaces bare day count */}
+              {(() => {
+                const bw = bookingWindow(daysAway);
+                return (
+                  <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <div className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Book When</div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={11} className="text-slate-500 flex-shrink-0" />
+                      <span className={cn("text-sm font-bold leading-none", bw.color)}>{bw.label}</span>
+                    </div>
+                    <p className="text-xs text-slate-600 mt-1 leading-snug">{bw.sub}</p>
+                  </div>
+                );
+              })()}
 
-              <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <div className="text-xs text-slate-400 mb-1">Trend</div>
-                <div className="flex items-center gap-1">
-                  {trendIcon}
-                  <span className="text-base font-bold text-white">{signal?.trend ?? "—"}</span>
-                </div>
-                <div className="flex items-center gap-1 mt-1">
-                  <Users size={10} className="text-slate-600" />
-                  <p className="text-xs text-slate-600">{dataPoints} data pts</p>
-                </div>
-              </div>
+              {/* Tile 3: Price Direction — replaces bare RISING/FALLING/STABLE */}
+              {(() => {
+                const pd = priceDirection(signal?.trend ?? "STABLE");
+                return (
+                  <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <div className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Direction</div>
+                    <span className={cn("text-sm font-bold", pd.color)}>{pd.label}</span>
+                    <p className="text-xs text-slate-600 mt-1 leading-snug">{pd.sub}</p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Auto reasoning */}
@@ -371,6 +384,19 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                   {signal.reasoning}
                 </p>
               </div>
+            )}
+
+            {/* Book on AA */}
+            {aaBookingUrl && (
+              <a
+                href={aaBookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#004b87]/80 border border-[#0073cf]/50 text-white text-sm font-semibold hover:bg-[#004b87] transition-colors"
+              >
+                <Plane size={14} className="text-sky-300" />
+                Book on American Airlines
+              </a>
             )}
           </div>
 

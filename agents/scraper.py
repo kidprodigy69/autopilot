@@ -235,11 +235,21 @@ async def fetch_trip_options(trip: dict, debug: bool = False) -> dict:
 
     print(f"[Scraper] {trip['id']}: {aa_nonstop_count} AA nonstop → morning:{len(slots['morning'])} afternoon:{len(slots['afternoon'])}")
 
+    # AA.com pre-filled search URL — deepest link possible without AA partner API
+    cabin_label = {"ECONOMY": "Economy", "PREMIUM_ECONOMY": "PremiumEconomy", "BUSINESS": "Business", "FIRST": "First"}.get(trip.get("cabin_class", "ECONOMY"), "Economy")
+    aa_booking_url = (
+        f"https://www.aa.com/booking/search#/roundTrip"
+        f"/{trip['origin']}/{trip['destination']}"
+        f"/{trip['depart_date']}/{trip['return_date']}"
+        f"/{trip['passengers']}/0/0/{cabin_label}/false"
+    )
+
     return {
         "morning": slots["morning"],
         "afternoon": slots["afternoon"],
         "price_insights": price_insights,
         "aa_nonstop_count": aa_nonstop_count,
+        "aa_booking_url": aa_booking_url,
     }
 
 

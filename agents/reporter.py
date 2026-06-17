@@ -1,8 +1,7 @@
 """
-Reporter Agent — sends email alerts when price drops ≥ threshold.
-Tracks a price baseline per trip. First poll sets the baseline (no alert).
-Every subsequent poll: alert if current price dropped ≥ threshold% from baseline.
-Baseline only updates downward (we track the last price we alerted on, not all-time high).
+Reporter Agent — sends price-drop alerts with AA booking links.
+Tracks a per-trip price baseline. First poll sets baseline (no alert).
+Every subsequent poll: email if price dropped ≥ threshold% from baseline.
 """
 import os
 import json
@@ -34,79 +33,161 @@ def save_baselines(data: dict):
     BASELINE_PATH.write_text(json.dumps(data, indent=2))
 
 
-def _build_html(trip: dict, signal: dict, options: dict, new_ppp: float, drop_pct: float) -> str:
-    action_color = {"BUY": "#22c55e", "HOLD": "#f59e0b", "WAIT": "#3b82f6"}.get(signal.get("action", ""), "#6b7280")
-    total = new_ppp * trip["passengers"]
+def _flight_rows_html(morning: list, afternoon: list) -> str:
+    rows = ""
+    for slot_label, flights in [("☀️ Morning", morning), ("🌇 Afternoon", afternoon)]:
+        for i, f in enumerate(flights[:3]):
+            fn = f.get("flight_number", "—")
+            dep = f.get("depart_time", "—")
+            arr = f.get("arrive_time", "—")
+            ppp = f.get("price_per_person", 0)
+            total = f.get("price_total", 0)
+            cheapest = i == 0 and len(flights) > 1
+            bg = "#0f2a1a" if cheapest else "#1e293b"
+            badge = '<span style="background:#22c55e;color:#fff;font-size:0.7em;padding:1px 5px;border-radius:3px;margin-left:4px">lowest</span>' if cheapest else ""
+            rows += f"""
+<tr style="background:{bg}">
+  <td style="padding:8px 10px;color:#94a3b8;font-size:0.82em;white-space:nowrap">{slot_label if i == 0 else ""}</td>
+  <td style="padding:8px 10px;font-family:monospace;font-weight:bold;color:#e2e8f0">{fn}{badge}</td>
+  <td style="padding:8px 10px;color:#cbd5e1;white-space:nowrap">{dep} → {arr}</td>
+  <td style="padding:8px 10px;text-align:right;white-space:nowrap">
+    <strong style="color:#22c55e">${ppp:.0f}</strong><span style="color:#475569;font-size:0.85em">/pp</span>
+    <br><span style="color:#475569;font-size:0.8em">${total:.0f} total</span>
+  </td>
+</tr>"""
+    return rows
 
-    # Best flights for email
+
+def _build_html(trip: dict, signal: dict, options: dict, new_ppp: float, drop_pct: float) -> str:
+    action = signal.get("action", "?")
+    action_color = {"BUY": "#22c55e", "HOLD": "#f59e0b", "WAIT": "#3b82f6"}.get(action, "#6b7280")
+    total = new_ppp * trip["passengers"]
     morning = options.get("morning", [])
     afternoon = options.get("afternoon", [])
-    flight_rows = ""
-    for slot_label, slot_flights in [("Morning", morning), ("Afternoon", afternoon)]:
-        for f in slot_flights[:2]:  # top 2 per slot
-            flight_rows += f"""
-    <tr>
-      <td style="padding:6px 8px;color:#94a3b8">{slot_label}</td>
-      <td style="padding:6px 8px;font-family:monospace">{f.get('flight_number','—')}</td>
-      <td style="padding:6px 8px">{f.get('depart_time','—')} → {f.get('arrive_time','—')}</td>
-      <td style="padding:6px 8px;font-weight:bold;color:#22c55e">${f.get('price_per_person',0):.0f}/pp</td>
-    </tr>"""
+    flight_rows = _flight_rows_html(morning, afternoon)
+    aa_url = options.get("aa_booking_url", "https://www.aa.com")
+    level = (signal.get("price_level") or "").upper()
+    level_color = {"LOW": "#22c55e", "TYPICAL": "#f59e0b", "HIGH": "#ef4444"}.get(level, "#94a3b8")
+    typical = signal.get("typical_range_ppp")
+    typical_str = f"${typical[0]:.0f}–${typical[1]:.0f}/pp" if typical else ""
 
-    return f"""
-<html><body style="font-family:sans-serif;background:#0f172a;color:#e2e8f0;padding:24px;max-width:600px">
-  <div style="border-bottom:1px solid #1e3a5f;padding-bottom:12px;margin-bottom:20px">
-    <h2 style="color:#38bdf8;margin:0">✈️ Auto — Price Drop Alert</h2>
-    <p style="color:#475569;margin:4px 0 0">Autopilot · Onyx Media Group</p>
-  </div>
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#0b1628;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1628;padding:24px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#111827;border-radius:12px;overflow:hidden;border:1px solid #1e3a5f">
 
-  <table style="border-collapse:collapse;width:100%;margin-bottom:20px">
-    <tr><td style="padding:8px;color:#94a3b8;width:140px">Trip</td>
-        <td style="padding:8px;font-weight:bold">{trip['label']}</td></tr>
-    <tr style="background:#1e293b">
-      <td style="padding:8px;color:#94a3b8">Route</td>
-      <td style="padding:8px">{trip['origin']} ↔ {trip['destination']} · Nonstop AA</td></tr>
-    <tr><td style="padding:8px;color:#94a3b8">Dates</td>
-        <td style="padding:8px">{trip['depart_date']} → {trip['return_date']} ({trip['duration_days']} days)</td></tr>
-    <tr style="background:#1e293b">
-      <td style="padding:8px;color:#94a3b8">New Price</td>
-      <td style="padding:8px;font-size:1.4em;font-weight:bold;color:#22c55e">${new_ppp:.0f}/person · ${total:.0f} total</td></tr>
-    <tr><td style="padding:8px;color:#94a3b8">Price Drop</td>
-        <td style="padding:8px;color:#22c55e;font-weight:bold">↓ {drop_pct:.1f}%</td></tr>
-    <tr style="background:#1e293b">
-      <td style="padding:8px;color:#94a3b8">Signal</td>
-      <td style="padding:8px">
-        <span style="background:{action_color};color:#fff;padding:3px 10px;border-radius:4px;font-weight:bold">
-          {signal.get('action','?')}
-        </span>
-        {f"· Google: {signal.get('price_level','').upper()}" if signal.get('price_level') else ""}
-      </td></tr>
-  </table>
+  <!-- Header -->
+  <tr><td style="background:linear-gradient(135deg,#0c2340,#0f3460);padding:24px 28px">
+    <table width="100%"><tr>
+      <td>
+        <div style="font-size:0.75em;color:#38bdf8;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">Autopilot · Onyx Media Group</div>
+        <div style="font-size:1.5em;font-weight:800;color:#fff">✈️ Price Drop Detected</div>
+      </td>
+      <td align="right">
+        <div style="background:{action_color};color:#fff;font-weight:900;font-size:1.1em;padding:8px 16px;border-radius:8px;display:inline-block">{action}</div>
+      </td>
+    </tr></table>
+  </td></tr>
 
-  {"<h3 style='color:#94a3b8;font-size:0.9em;margin-bottom:8px'>AVAILABLE FLIGHTS</h3><table style='border-collapse:collapse;width:100%;font-size:0.85em'>" + flight_rows + "</table>" if flight_rows else ""}
+  <!-- Trip summary -->
+  <tr><td style="padding:20px 28px 0">
+    <table width="100%" style="border-collapse:collapse">
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em;width:130px">Trip</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;font-weight:600;color:#e2e8f0">{trip['label']}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em">Route</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#e2e8f0">{trip['origin']} ↔ {trip['destination']} · Nonstop · American Airlines</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em">Dates</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#e2e8f0">{trip['depart_date']} → {trip['return_date']} ({trip['duration_days']} days)</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em">New Price</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b">
+          <span style="font-size:1.6em;font-weight:900;color:#22c55e">${new_ppp:.0f}<span style="font-size:0.6em;font-weight:400;color:#6b7280">/person</span></span>
+          <span style="color:#94a3b8;font-size:0.9em;margin-left:8px">${total:.0f} total for {trip['passengers']} passengers</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em">Price Drop</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#22c55e;font-weight:700;font-size:1.1em">↓ {drop_pct:.1f}% from last check</td>
+      </tr>
+      {"" if not level else f'''<tr>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b;color:#64748b;font-size:0.85em">Google rates this</td>
+        <td style="padding:10px 0;border-bottom:1px solid #1e293b">
+          <span style="color:{level_color};font-weight:700">{level}</span>
+          {"&nbsp;·&nbsp;<span style='color:#475569;font-size:0.85em'>Typical " + typical_str + "</span>" if typical_str else ""}
+        </td>
+      </tr>'''}
+    </table>
+  </td></tr>
 
-  <div style="background:#1e293b;border-radius:8px;padding:12px;margin-top:16px">
-    <p style="color:#94a3b8;margin:0;font-style:italic;font-size:0.9em">
-      <strong style="color:#38bdf8">Auto says:</strong> {signal.get('reasoning','—')}
-    </p>
-  </div>
+  <!-- Available flights -->
+  {"" if not flight_rows else f'''
+  <tr><td style="padding:20px 28px 0">
+    <div style="font-size:0.7em;font-weight:700;color:#475569;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">Available Nonstop Flights</div>
+    <table width="100%" style="border-collapse:collapse;border-radius:8px;overflow:hidden;font-size:0.88em">
+      <tr style="background:#0f172a">
+        <td style="padding:6px 10px;color:#475569;font-size:0.8em">Slot</td>
+        <td style="padding:6px 10px;color:#475569;font-size:0.8em">Flight</td>
+        <td style="padding:6px 10px;color:#475569;font-size:0.8em">Times</td>
+        <td style="padding:6px 10px;color:#475569;font-size:0.8em;text-align:right">Price</td>
+      </tr>
+      {flight_rows}
+    </table>
+  </td></tr>
+  '''}
 
-  <p style="color:#334155;font-size:0.75em;margin-top:20px">
-    Auto checks prices 4x daily · autopilot-onyx.vercel.app
-  </p>
-</body></html>
-"""
+  <!-- Book on AA button -->
+  <tr><td style="padding:24px 28px">
+    <table width="100%"><tr>
+      <td align="center">
+        <a href="{aa_url}" target="_blank"
+           style="display:inline-block;background:#004b87;color:#fff;font-weight:700;font-size:1em;
+                  padding:14px 32px;border-radius:8px;text-decoration:none;letter-spacing:0.02em;
+                  border:2px solid #0073cf">
+          🛫 Book on American Airlines
+        </a>
+        <div style="color:#334155;font-size:0.75em;margin-top:8px">
+          Opens aa.com with {trip['origin']} ↔ {trip['destination']} · {trip['depart_date']} pre-filled
+        </div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Auto reasoning -->
+  <tr><td style="padding:0 28px 24px">
+    <div style="background:#0f172a;border-left:3px solid #1e40af;border-radius:0 8px 8px 0;padding:14px 16px">
+      <div style="color:#38bdf8;font-size:0.75em;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Auto's Reasoning</div>
+      <div style="color:#94a3b8;font-size:0.88em;line-height:1.5">{signal.get('reasoning','—')}</div>
+    </div>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#0b1628;padding:16px 28px;text-align:center;border-top:1px solid #1e293b">
+    <div style="color:#1e3a5f;font-size:0.75em">
+      Auto checks prices 4× daily · <a href="https://autopilot-onyx.vercel.app" style="color:#1e40af;text-decoration:none">View Dashboard</a>
+    </div>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>"""
 
 
 def send_alert(trip: dict, signal: dict, options: dict, new_ppp: float, drop_pct: float):
     config = load_config()
     gmail_user = os.getenv("GMAIL_USER")
     gmail_pass = os.getenv("GMAIL_APP_PASSWORD")
-
     if not gmail_user or not gmail_pass:
-        print("[Reporter] GMAIL credentials not set — skipping email.")
+        print("[Reporter] Gmail credentials not set — skipping email.")
         return
 
-    total = new_ppp * trip["passengers"]
     subject = f"✈️ Auto: {trip['label']} dropped {drop_pct:.1f}% → ${new_ppp:.0f}/person — {signal.get('action','?')}"
     html = _build_html(trip, signal, options, new_ppp, drop_pct)
 
@@ -126,12 +207,6 @@ def send_alert(trip: dict, signal: dict, options: dict, new_ppp: float, drop_pct
 
 
 def check_and_alert(trip: dict, signal: dict, options: dict):
-    """
-    Compare current best price to stored baseline.
-    First run: set baseline, no alert.
-    Subsequent runs: alert if dropped ≥ threshold% from baseline.
-    Baseline updates to new price after an alert so next alert is relative to the new level.
-    """
     config = load_config()
     threshold = config["autopilot"]["price_drop_threshold_pct"]
     trip_id = trip["id"]
@@ -145,7 +220,6 @@ def check_and_alert(trip: dict, signal: dict, options: dict):
     baseline_ppp = entry.get("baseline_ppp")
 
     if baseline_ppp is None:
-        # First time seeing this trip — set baseline, no alert
         baselines[trip_id] = {
             "baseline_ppp": best_ppp,
             "set_at": datetime.utcnow().isoformat(),
@@ -164,6 +238,6 @@ def check_and_alert(trip: dict, signal: dict, options: dict):
         baselines[trip_id]["alerts_sent"] = entry.get("alerts_sent", 0) + 1
         save_baselines(baselines)
     elif drop_pct > 0:
-        print(f"[Reporter] {trip_id}: ${best_ppp:.0f}/pp, down {drop_pct:.1f}% from baseline ${baseline_ppp:.0f} — below {threshold}% threshold")
-    elif drop_pct < 0:
-        print(f"[Reporter] {trip_id}: ${best_ppp:.0f}/pp, up {abs(drop_pct):.1f}% from baseline ${baseline_ppp:.0f}")
+        print(f"[Reporter] {trip_id}: ${best_ppp:.0f}/pp — down {drop_pct:.1f}% (threshold {threshold}%)")
+    else:
+        print(f"[Reporter] {trip_id}: ${best_ppp:.0f}/pp — up {abs(drop_pct):.1f}% from baseline")
