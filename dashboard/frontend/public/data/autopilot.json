@@ -58,7 +58,7 @@
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
-      "aa_booking_url": "https://www.google.com/travel/flights?hl=en#flt=CLT.TVC.2026-08-19*TVC.CLT.2026-08-23;c:USD;e:1;sd:1;t:f"
+      "aa_booking_url": "https://www.kayak.com/flights/CLT-TVC/2026-08-19/2026-08-23/2adults?fs=stops%3D0%2Cairlines%3DAA"
     },
     "orlando": {
       "morning": [
@@ -192,7 +192,7 @@
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
-      "aa_booking_url": "https://www.google.com/travel/flights?hl=en#flt=CLT.MCO.2026-12-05*MCO.CLT.2026-12-13;c:USD;e:1;sd:1;t:f"
+      "aa_booking_url": "https://www.kayak.com/flights/CLT-MCO/2026-12-05/2026-12-13/2adults?fs=stops%3D0%2Cairlines%3DAA"
     }
   },
   "signals": [

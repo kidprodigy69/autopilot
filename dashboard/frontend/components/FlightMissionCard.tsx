@@ -159,7 +159,7 @@ function SlotSection({
                   href={aaBookingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={`Open Google Flights for this route — click "Book with American Airlines" to go to AA.com checkout for ${f.flight_number}`}
+                  title={`Open Kayak showing nonstop AA flights — select ${f.flight_number}, then click "Book on American.com"`}
                   className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-emerald-900/40 border border-emerald-700/40 text-emerald-400 hover:bg-emerald-800/60 hover:text-white transition-colors font-semibold"
                 >
                   Book <ExternalLink size={10} />
@@ -405,7 +405,7 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
             <div className="flex items-center gap-1.5 pt-1">
               <ExternalLink size={10} className="text-slate-700 flex-shrink-0" />
               <p className="text-xs text-slate-700 leading-snug">
-                Prices from Google Flights at last check — click <span className="text-slate-600 font-medium">Book</span> to confirm live fare on Google, then select &ldquo;Book with American Airlines&rdquo; for AA checkout.
+                Prices from Google Flights at last check — click <span className="text-slate-600 font-medium">Book</span> to open Kayak (nonstop AA only), pick your flight, then select &ldquo;Book on American.com&rdquo; for AA checkout.
               </p>
             </div>
 

@@ -236,19 +236,20 @@ async def fetch_trip_options(trip: dict, debug: bool = False) -> dict:
 
     print(f"[Scraper] {trip['id']}: {aa_nonstop_count} AA nonstop → morning:{len(slots['morning'])} afternoon:{len(slots['afternoon'])}")
 
-    # Google Flights pre-filled search URL.
-    # AA.com has no public deep-link format that works without server-side session state:
-    #   - /booking/search#/roundTrip/... → 404 (SPA not served from that path)
-    #   - /booking/choose-flights/1.do → session-timeout (expects an active booking session)
-    # Google Flights is reliable, shows live prices, and "Book with American Airlines"
-    # takes the user directly to AA.com checkout for that specific flight.
-    cabin_num = {"ECONOMY": 1, "PREMIUM_ECONOMY": 2, "BUSINESS": 3, "FIRST": 4}.get(trip.get("cabin_class", "ECONOMY"), 1)
+    # Kayak pre-filled search URL — the most reliable deep-link for flight search.
+    # Tested approaches that failed:
+    #   - aa.com/booking/search#/roundTrip/... → 404 (SPA not served from that path)
+    #   - aa.com/booking/choose-flights/1.do → session-timeout (requires active session)
+    #   - google.com/travel/flights?hl=en#flt=... → page loads but ignores hash params
+    # Kayak's URL format is stable, documented, and pre-fills origin/dest/dates/pax.
+    # Filters: nonstop only (stops=0) + American Airlines only (airlines=AA).
+    # User flow: Kayak shows matching AA flights → click one → "Book on American.com" → AA checkout.
     aa_booking_url = (
-        f"https://www.google.com/travel/flights"
-        f"?hl=en"
-        f"#flt={trip['origin']}.{trip['destination']}.{trip['depart_date']}"
-        f"*{trip['destination']}.{trip['origin']}.{trip['return_date']}"
-        f";c:USD;e:{cabin_num};sd:1;t:f"
+        f"https://www.kayak.com/flights"
+        f"/{trip['origin']}-{trip['destination']}"
+        f"/{trip['depart_date']}/{trip['return_date']}"
+        f"/{trip['passengers']}adults"
+        f"?fs=stops%3D0%2Cairlines%3DAA"
     )
 
     return {
