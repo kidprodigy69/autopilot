@@ -1,0 +1,12 @@
+{
+  "traverse_city": {
+    "baseline_ppp": 581.0,
+    "set_at": "2026-06-17T03:11:05.082095",
+    "alerts_sent": 0
+  },
+  "orlando": {
+    "baseline_ppp": 447.0,
+    "set_at": "2026-06-17T03:11:05.082358",
+    "alerts_sent": 0
+  }
+}
