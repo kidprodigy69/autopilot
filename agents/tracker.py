@@ -11,7 +11,7 @@ from datetime import datetime
 
 from agents.scraper import run_all_trips
 from agents.analyzer import record_prices, seed_from_google, get_all_signals, get_price_chart_data
-from agents.reporter import check_and_alert
+from agents.reporter import check_and_alert, send_status_update
 
 CONFIG_PATH = Path(__file__).parent.parent / "config.json"
 STATUS_PATH = Path(__file__).parent.parent / "data" / "tracker_status.json"
@@ -151,9 +151,18 @@ async def poll_cycle():
         print(f"[Tracker] {trip_id}: morning={m_str} afternoon={a_str} google={level} aa_flights={aa_count}")
 
     signals = get_all_signals(list(trips.values()), options_map)
+
+    # Check each trip for price drops; collect results for the status email
+    signals_map = {s["trip_id"]: s for s in signals}
+    drop_trips: dict[str, float] = {}
     for sig in signals:
         trip = trips[sig["trip_id"]]
-        check_and_alert(trip, sig, options_map.get(sig["trip_id"], {}))
+        dropped, drop_pct = check_and_alert(trip, sig, options_map.get(sig["trip_id"], {}))
+        if dropped:
+            drop_trips[trip["id"]] = drop_pct
+
+    # Always send a status email at every poll cycle
+    send_status_update(active_trips, signals_map, options_map, drop_trips or None)
 
     write_public_data(config, signals, options_map)
 
