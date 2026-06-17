@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T09:05:21.725605Z",
+  "updated_at": "2026-06-17T13:39:22.877210Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -210,30 +210,30 @@
     {
       "trip_id": "traverse_city",
       "action": "BUY",
-      "confidence": 0.653,
+      "confidence": 0.667,
       "best_price_per_person": 581.0,
       "predicted_low_per_person": 564.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 63,
-      "data_points": 4,
+      "data_points": 5,
       "reasoning": "Price at or near predicted floor ($564/person). In the booking sweet spot at 63 days out.",
-      "trend": "STABLE"
+      "trend": "RISING"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
-      "confidence": 0.653,
+      "confidence": 0.667,
       "best_price_per_person": 447.0,
       "predicted_low_per_person": 361.5,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 171,
-      "data_points": 4,
+      "data_points": 5,
       "reasoning": "Google rates this price as HIGH. With 171 days of runway, hold \u2014 prices typically pull back toward the typical range.",
-      "trend": "STABLE"
+      "trend": "RISING"
     }
   ],
   "history": {
@@ -257,6 +257,11 @@
         "ts": "2026-06-17T09:05:20.047976",
         "morning": 581.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-17T13:39:21.726452",
+        "morning": 581.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -277,6 +282,11 @@
       },
       {
         "ts": "2026-06-17T09:05:20.048228",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-17T13:39:21.726725",
         "morning": 447.0,
         "afternoon": 447.0
       }
