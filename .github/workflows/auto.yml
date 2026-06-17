@@ -2,9 +2,9 @@ name: Auto — Flight Price Check
 
 on:
   schedule:
-    # Runs at 8am and 8pm EST (1pm and 1am UTC)
+    # 8am and 8pm EST daily (1pm and 1am UTC)
     - cron: '0 13,1 * * *'
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   poll:
@@ -15,15 +15,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           python-version: '3.11'
           cache: pip
@@ -36,6 +32,16 @@ jobs:
           git config user.name "Auto"
           git config user.email "auto@autopilot.onyx"
 
+      - name: Validate secrets
+        run: |
+          if [ -z "$SERPAPI_KEY" ]; then
+            echo "ERROR: SERPAPI_KEY secret is not set in this repo."
+            echo "Go to Settings → Secrets → Actions and add SERPAPI_KEY."
+            exit 1
+          fi
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+
       - name: Run poll cycle
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
@@ -47,6 +53,6 @@ jobs:
         run: |
           git add dashboard/frontend/public/data/autopilot.json \
                   dashboard/frontend/public/data/price_history.json
-          git diff --cached --quiet && echo "No price changes" && exit 0
+          git diff --cached --quiet && echo "No price changes, skipping commit." && exit 0
           git commit -m "Auto: price update $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin main
