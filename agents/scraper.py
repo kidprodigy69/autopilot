@@ -228,6 +228,7 @@ async def fetch_trip_options(trip: dict, debug: bool = False) -> dict:
             "return_flight_number": return_leg.get("flight_number") if return_leg else None,
             "return_depart_time": return_leg.get("departure_airport", {}).get("time") if return_leg else None,
             "return_arrive_time": return_leg.get("arrival_airport", {}).get("time") if return_leg else None,
+            "booking_token": flight.get("booking_token"),
         })
 
     for s in slots:
@@ -235,13 +236,27 @@ async def fetch_trip_options(trip: dict, debug: bool = False) -> dict:
 
     print(f"[Scraper] {trip['id']}: {aa_nonstop_count} AA nonstop → morning:{len(slots['morning'])} afternoon:{len(slots['afternoon'])}")
 
-    # AA.com pre-filled search URL — deepest link possible without AA partner API
-    cabin_label = {"ECONOMY": "Economy", "PREMIUM_ECONOMY": "PremiumEconomy", "BUSINESS": "Business", "FIRST": "First"}.get(trip.get("cabin_class", "ECONOMY"), "Economy")
+    # AA.com booking URL — use their stable choose-flights endpoint.
+    # Their newer SPA hash routing (/booking/search#/roundTrip/...) returns 404
+    # because the server doesn't serve the SPA from that path.
+    # The /booking/choose-flights/1.do endpoint is server-side and stable.
+    # Dates in MM/DD/YY format, URL-encoded slashes.
+    def _aa_date(iso: str) -> str:
+        d = datetime.strptime(iso, "%Y-%m-%d")
+        return f"{d.month:02d}%2F{d.day:02d}%2F{str(d.year)[2:]}"
+
+    cabin_code = {"ECONOMY": "COACH", "PREMIUM_ECONOMY": "PREMIUM_ECONOMY", "BUSINESS": "BUSINESS", "FIRST": "FIRST"}.get(trip.get("cabin_class", "ECONOMY"), "COACH")
     aa_booking_url = (
-        f"https://www.aa.com/booking/search#/roundTrip"
-        f"/{trip['origin']}/{trip['destination']}"
-        f"/{trip['depart_date']}/{trip['return_date']}"
-        f"/{trip['passengers']}/0/0/{cabin_label}/false"
+        f"https://www.aa.com/booking/choose-flights/1.do"
+        f"?B_DATE={_aa_date(trip['depart_date'])}"
+        f"&RETURN_DATE={_aa_date(trip['return_date'])}"
+        f"&ORIGIN={trip['origin']}"
+        f"&DESTINATION={trip['destination']}"
+        f"&ADULTS={trip['passengers']}"
+        f"&TRIP_TYPE=R"
+        f"&CLASS={cabin_code}"
+        f"&FLEX=2"
+        f"&SEGMENTS=1"
     )
 
     return {

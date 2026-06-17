@@ -21,6 +21,7 @@ type FlightOption = {
   return_flight_number: string | null;
   return_depart_time: string | null;
   return_arrive_time: string | null;
+  booking_token: string | null;
 };
 
 type Signal = {
@@ -72,11 +73,12 @@ const LEVEL_CONFIG = {
 };
 
 function SlotSection({
-  icon, label, flights,
+  icon, label, flights, aaBookingUrl,
 }: {
   icon: React.ReactNode;
   label: string;
   flights: FlightOption[];
+  aaBookingUrl?: string;
 }) {
   if (!flights.length) {
     return (
@@ -145,13 +147,24 @@ function SlotSection({
               )}
             </div>
 
-            {/* Price */}
-            <div className="text-right flex-shrink-0">
+            {/* Price + Book button */}
+            <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
               <p className={cn("text-sm font-black tabular-nums", i === 0 ? "text-white" : "text-slate-400")}>
                 ${f.price_per_person.toFixed(0)}
                 <span className="text-xs font-normal text-slate-500">/pp</span>
               </p>
               <p className="text-xs text-slate-600">${f.price_total.toFixed(0)} total</p>
+              {aaBookingUrl && (
+                <a
+                  href={aaBookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Search AA flights for ${f.flight_number} — select this flight on aa.com`}
+                  className="text-xs px-2 py-0.5 rounded bg-[#004b87]/60 border border-[#0073cf]/40 text-sky-300 hover:bg-[#004b87] hover:text-white transition-colors font-semibold"
+                >
+                  Book →
+                </a>
+              )}
             </div>
           </div>
         ))}
@@ -326,11 +339,13 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
                 icon={<Sunrise size={14} className="text-amber-400 flex-shrink-0" />}
                 label="Morning departures (5am–noon)"
                 flights={morning}
+                aaBookingUrl={aaBookingUrl}
               />
               <SlotSection
                 icon={<Sunset size={14} className="text-orange-400 flex-shrink-0" />}
                 label="Afternoon departures (noon–6pm)"
                 flights={afternoon}
+                aaBookingUrl={aaBookingUrl}
               />
             </div>
 
@@ -386,18 +401,6 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
               </div>
             )}
 
-            {/* Book on AA */}
-            {aaBookingUrl && (
-              <a
-                href={aaBookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#004b87]/80 border border-[#0073cf]/50 text-white text-sm font-semibold hover:bg-[#004b87] transition-colors"
-              >
-                <Plane size={14} className="text-sky-300" />
-                Book on American Airlines
-              </a>
-            )}
           </div>
 
           {/* Holographic shine */}

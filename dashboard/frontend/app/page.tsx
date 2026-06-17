@@ -29,6 +29,7 @@ type FlightOption = {
   return_flight_number: string | null;
   return_depart_time: string | null;
   return_arrive_time: string | null;
+  booking_token: string | null;
 };
 
 type Signal = {
