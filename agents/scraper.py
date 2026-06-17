@@ -4,6 +4,7 @@ Filters: American Airlines (including AA-numbered regional codeshares), nonstop 
 Returns morning (5am–11:59am) and afternoon (12pm–5:59pm) departure slots.
 """
 import os
+import re
 import json
 import httpx
 from datetime import datetime
@@ -30,35 +31,46 @@ def load_config() -> dict:
 
 def _parse_hour(time_str: str) -> int | None:
     """
-    Parse departure time to hour. Handles multiple formats:
-      '7:45 AM'  → 7    (SerpAPI standard)
-      '07:45'    → 7    (24h fallback)
-      '19:45'    → 19
+    Parse departure time to hour. Handles any format SerpAPI might return:
+      '7:45 AM'              → 7
+      '12:30 PM'             → 12
+      '07:45'                → 7   (24h)
+      '19:45'                → 19  (24h)
+      '2026-08-19 7:45 AM'   → 7   (date-prefixed)
+      '2026-08-19T07:45:00'  → 7   (ISO)
+    Uses regex to extract the time regardless of surrounding context.
     """
-    s = time_str.strip()
-    # 12-hour with AM/PM
-    for fmt in ("%I:%M %p", "%I:%M%p"):
+    s = ' '.join(time_str.split())  # normalize all whitespace
+
+    # Try exact strptime matches first (fastest path)
+    for fmt in ("%I:%M %p", "%I:%M%p", "%H:%M", "%H:%M:%S"):
         try:
             return datetime.strptime(s, fmt).hour
         except ValueError:
             pass
-    # 24-hour HH:MM
-    try:
-        parts = s.split(":")
-        if len(parts) >= 2:
-            return int(parts[0])
-    except Exception:
-        pass
+
+    # Regex: find HH:MM optionally followed by AM/PM anywhere in the string
+    m = re.search(r'(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM|am|pm)?', s)
+    if m:
+        hour = int(m.group(1))
+        ampm = (m.group(3) or "").upper()
+        if ampm == "PM" and hour != 12:
+            hour += 12
+        elif ampm == "AM" and hour == 12:
+            hour = 0
+        return hour
+
     return None
 
 
 def _time_slot(time_str: str) -> str:
     hour = _parse_hour(time_str)
     if hour is None:
+        print(f"    [time-parse FAIL] could not parse: {repr(time_str)}")
         return "other"
     if 5 <= hour < 12:
         return "morning"
-    if 12 <= hour < 18:
+    if 12 <= hour < 19:  # up to 6:59pm
         return "afternoon"
     return "other"
 
