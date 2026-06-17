@@ -401,13 +401,6 @@ export default function FlightMissionCard({ trip, morning, afternoon, signal, lo
               </div>
             )}
 
-            {/* Price source note */}
-            <div className="flex items-center gap-1.5 pt-1">
-              <ExternalLink size={10} className="text-slate-700 flex-shrink-0" />
-              <p className="text-xs text-slate-700 leading-snug">
-                Tracked price from last Auto check — <span className="text-slate-600 font-medium">Book</span> opens Kayak with the live fare (nonstop AA only). Kayak price is what you&apos;ll pay at AA checkout.
-              </p>
-            </div>
 
           </div>
 

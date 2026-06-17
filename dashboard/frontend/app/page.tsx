@@ -135,6 +135,16 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* Price disclaimer banner */}
+      <div className="border-b border-amber-900/30 bg-amber-950/20">
+        <div className="max-w-5xl mx-auto px-6 py-2 flex items-center gap-2">
+          <span className="text-amber-500 text-xs">⚠</span>
+          <p className="text-xs text-amber-700/80">
+            Prices shown are from the last Auto check and <span className="text-amber-600 font-semibold">may be lower than actual checkout price.</span> Click <span className="text-amber-600 font-semibold">Book</span> on any flight to see the live fare on Kayak before committing.
+          </p>
+        </div>
+      </div>
+
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
 
         {!loading && !data.updated_at && (
