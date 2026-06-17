@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T03:11:05.082706Z",
+  "updated_at": "2026-06-17T09:05:21.725605Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -47,7 +47,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         }
       ],
       "afternoon": [],
@@ -72,7 +73,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -84,7 +86,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -96,7 +99,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -108,7 +112,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         }
       ],
       "afternoon": [
@@ -122,7 +127,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -134,7 +140,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -146,7 +153,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -158,7 +166,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -170,7 +179,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         },
         {
           "available": true,
@@ -182,7 +192,8 @@
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
-          "return_arrive_time": null
+          "return_arrive_time": null,
+          "booking_token": null
         }
       ],
       "price_insights": {
@@ -199,28 +210,28 @@
     {
       "trip_id": "traverse_city",
       "action": "BUY",
-      "confidence": 0.64,
+      "confidence": 0.653,
       "best_price_per_person": 581.0,
       "predicted_low_per_person": 564.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 63,
-      "data_points": 3,
+      "data_points": 4,
       "reasoning": "Price at or near predicted floor ($564/person). In the booking sweet spot at 63 days out.",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
-      "confidence": 0.64,
+      "confidence": 0.653,
       "best_price_per_person": 447.0,
       "predicted_low_per_person": 361.5,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 171,
-      "data_points": 3,
+      "data_points": 4,
       "reasoning": "Google rates this price as HIGH. With 171 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -241,6 +252,11 @@
         "ts": "2026-06-17T03:11:05.081210",
         "morning": 581.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-17T09:05:20.047976",
+        "morning": 581.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -256,6 +272,11 @@
       },
       {
         "ts": "2026-06-17T03:11:05.081529",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-17T09:05:20.048228",
         "morning": 447.0,
         "afternoon": 447.0
       }
