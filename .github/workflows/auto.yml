@@ -2,8 +2,12 @@ name: Auto — Flight Price Check
 
 on:
   schedule:
-    # 8am and 8pm EST daily (1pm and 1am UTC)
-    - cron: '0 13,1 * * *'
+    # 6am, noon, 6pm, midnight EDT (UTC-4 summer / UTC-5 winter)
+    # Using EDT: 10:00, 16:00, 22:00, 04:00 UTC
+    - cron: '0 10 * * *'   # 6am EDT
+    - cron: '0 16 * * *'   # noon EDT
+    - cron: '0 22 * * *'   # 6pm EDT
+    - cron: '0 4 * * *'    # midnight EDT
   workflow_dispatch:
 
 jobs:
@@ -35,8 +39,8 @@ jobs:
       - name: Validate secrets
         run: |
           if [ -z "$SERPAPI_KEY" ]; then
-            echo "ERROR: SERPAPI_KEY secret is not set in this repo."
-            echo "Go to Settings → Secrets → Actions and add SERPAPI_KEY."
+            echo "ERROR: SERPAPI_KEY secret is not set."
+            echo "Go to repo Settings → Secrets → Actions and add SERPAPI_KEY."
             exit 1
           fi
         env:
@@ -52,7 +56,9 @@ jobs:
       - name: Push price update
         run: |
           git add dashboard/frontend/public/data/autopilot.json \
-                  dashboard/frontend/public/data/price_history.json
-          git diff --cached --quiet && echo "No price changes, skipping commit." && exit 0
+                  dashboard/frontend/public/data/price_history.json \
+                  data/api_budget.json \
+                  data/price_baselines.json
+          git diff --cached --quiet && echo "No changes to push." && exit 0
           git commit -m "Auto: price update $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin main

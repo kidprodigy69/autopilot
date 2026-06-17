@@ -1,5 +1,7 @@
 .venv/
-/data/
+# data/ is tracked — api_budget.json and price_baselines.json must persist between CI runs
+# Only exclude local-only status file
+/data/tracker_status.json
 .env
 __pycache__/
 *.pyc

@@ -2,7 +2,7 @@
   "autopilot": {
     "name": "Auto",
     "version": "1.0.0",
-    "check_interval_minutes": 720,
+    "check_interval_minutes": 360,
     "alert_emails": [
       "milesdailey19@gmail.com",
       "onyxmediagroupclt@gmail.com"
@@ -21,7 +21,6 @@
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": ["AA"],
-      "max_price_total": 1200,
       "nonstop_only": true,
       "active": true
     },
@@ -30,19 +29,19 @@
       "label": "Orlando Trip",
       "origin": "CLT",
       "destination": "MCO",
-      "depart_date": "2026-12-07",
+      "depart_date": "2026-12-05",
       "return_date": "2026-12-13",
-      "duration_days": 6,
+      "duration_days": 8,
       "passengers": 2,
       "cabin_class": "ECONOMY",
       "preferred_airlines": ["AA"],
-      "max_price_total": 1200,
       "nonstop_only": true,
       "active": true
     }
   ],
   "serpapi": {
     "base_url": "https://serpapi.com/search",
-    "note": "Free plan: 250 searches/month. 2 trips x 2 checks/day x 30 days = 120/month."
+    "monthly_budget": 245,
+    "note": "Free plan: 250 searches/month. 2 trips x 4 checks/day x 31 days = 248/month. Budget cap at 245 leaves buffer for manual runs."
   }
 }
