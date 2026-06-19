@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-18T23:26:56.383048Z",
+  "updated_at": "2026-06-19T09:08:15.245874Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -55,7 +55,7 @@
       "price_insights": {
         "price_level": "typical",
         "typical_range_ppp": null,
-        "lowest_ppp": 564.5,
+        "lowest_ppp": 500.5,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
@@ -209,30 +209,30 @@
   "signals": [
     {
       "trip_id": "traverse_city",
-      "action": "BUY",
-      "confidence": 0.747,
+      "action": "HOLD",
+      "confidence": 0.71,
       "best_price_per_person": 581.0,
-      "predicted_low_per_person": 564.5,
+      "predicted_low_per_person": 500.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
-      "days_to_depart": 62,
-      "data_points": 11,
-      "reasoning": "Price at or near predicted floor ($564/person). In the booking sweet spot at 62 days out.",
+      "days_to_depart": 61,
+      "data_points": 12,
+      "reasoning": "$581/person, 61 days out. Google: TYPICAL. No strong signal \u2014 watch for a drop below $500/person.",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
-      "confidence": 0.733,
+      "confidence": 0.747,
       "best_price_per_person": 447.0,
       "predicted_low_per_person": 361.5,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
-      "days_to_depart": 170,
-      "data_points": 10,
-      "reasoning": "Google rates this price as HIGH. With 170 days of runway, hold \u2014 prices typically pull back toward the typical range.",
+      "days_to_depart": 169,
+      "data_points": 11,
+      "reasoning": "Google rates this price as HIGH. With 169 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "RISING"
     }
   ],
@@ -292,6 +292,11 @@
         "ts": "2026-06-18T23:26:55.300260",
         "morning": 581.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-19T09:08:13.283529",
+        "morning": 581.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -342,6 +347,11 @@
       },
       {
         "ts": "2026-06-18T23:26:55.300546",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-19T09:08:13.283854",
         "morning": 447.0,
         "afternoon": 447.0
       }
