@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T12:08:50.992332Z",
+  "updated_at": "2026-06-21T17:20:36.951809Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -210,14 +210,14 @@
     {
       "trip_id": "traverse_city",
       "action": "HOLD",
-      "confidence": 0.83,
+      "confidence": 0.843,
       "best_price_per_person": 576.0,
       "predicted_low_per_person": 500.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 59,
-      "data_points": 21,
+      "data_points": 22,
       "reasoning": "$576/person, 59 days out. Google: TYPICAL. No strong signal \u2014 watch for a drop below $500/person.",
       "trend": "STABLE"
     },
@@ -231,7 +231,7 @@
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 167,
-      "data_points": 20,
+      "data_points": 21,
       "reasoning": "Google rates this price as HIGH. With 167 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -342,6 +342,11 @@
         "ts": "2026-06-21T12:08:49.191317",
         "morning": 576.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-21T17:20:35.591520",
+        "morning": 576.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -442,6 +447,11 @@
       },
       {
         "ts": "2026-06-21T12:08:49.191710",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-21T17:20:35.591869",
         "morning": 447.0,
         "afternoon": 447.0
       }
