@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-23T12:30:21.484751Z",
+  "updated_at": "2026-06-23T17:46:37.752047Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -217,7 +217,7 @@
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 57,
-      "data_points": 29,
+      "data_points": 30,
       "reasoning": "$576/person, 57 days out. Google: TYPICAL. No strong signal \u2014 watch for a drop below $500/person.",
       "trend": "STABLE"
     },
@@ -231,7 +231,7 @@
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 165,
-      "data_points": 28,
+      "data_points": 29,
       "reasoning": "Google rates this price as HIGH. With 165 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -382,6 +382,11 @@
         "ts": "2026-06-23T12:30:19.516824",
         "morning": 576.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-23T17:46:36.356002",
+        "morning": 576.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -522,6 +527,11 @@
       },
       {
         "ts": "2026-06-23T12:30:19.517274",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-23T17:46:36.356916",
         "morning": 447.0,
         "afternoon": 447.0
       }
