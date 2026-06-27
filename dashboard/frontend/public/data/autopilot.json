@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-26T22:57:30.940618Z",
+  "updated_at": "2026-06-27T06:55:37.670361Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -67,9 +67,9 @@
           "available": true,
           "price_total": 894.0,
           "price_per_person": 447.0,
-          "depart_time": "2026-12-05 07:05",
-          "arrive_time": "2026-12-05 08:50",
-          "flight_number": "AA 713",
+          "depart_time": "2026-12-05 07:55",
+          "arrive_time": "2026-12-05 09:40",
+          "flight_number": "AA 691",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -80,9 +80,9 @@
           "available": true,
           "price_total": 894.0,
           "price_per_person": 447.0,
-          "depart_time": "2026-12-05 07:55",
-          "arrive_time": "2026-12-05 09:40",
-          "flight_number": "AA 691",
+          "depart_time": "2026-12-05 07:05",
+          "arrive_time": "2026-12-05 08:50",
+          "flight_number": "AA 713",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -199,7 +199,7 @@
       "price_insights": {
         "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": 334.0,
+        "lowest_ppp": 335.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
@@ -216,9 +216,9 @@
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
-      "days_to_depart": 54,
-      "data_points": 43,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 54 days left, seats fill and prices climb. At $581/person this is unlikely to get cheaper.",
+      "days_to_depart": 53,
+      "data_points": 44,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 53 days left, seats fill and prices climb. At $581/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
     {
@@ -226,13 +226,13 @@
       "action": "WAIT",
       "confidence": 0.85,
       "best_price_per_person": 447.0,
-      "predicted_low_per_person": 334.0,
+      "predicted_low_per_person": 335.0,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
-      "days_to_depart": 162,
-      "data_points": 42,
-      "reasoning": "Google rates this price as HIGH. With 162 days of runway, hold \u2014 prices typically pull back toward the typical range.",
+      "days_to_depart": 161,
+      "data_points": 43,
+      "reasoning": "Google rates this price as HIGH. With 161 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
   ],
@@ -452,6 +452,11 @@
         "ts": "2026-06-26T22:57:29.642645",
         "morning": 581.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-27T06:55:36.680822",
+        "morning": 581.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -662,6 +667,11 @@
       },
       {
         "ts": "2026-06-26T22:57:29.643176",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-27T06:55:36.681371",
         "morning": 447.0,
         "afternoon": 447.0
       }
