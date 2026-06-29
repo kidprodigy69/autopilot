@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-29T18:04:38.616591Z",
+  "updated_at": "2026-06-29T22:44:19.584275Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -39,8 +39,8 @@
       "morning": [
         {
           "available": true,
-          "price_total": 1130.0,
-          "price_per_person": 565.0,
+          "price_total": 1162.0,
+          "price_per_person": 581.0,
           "depart_time": "2026-08-19 10:30",
           "arrive_time": "2026-08-19 12:52",
           "flight_number": "AA 5575",
@@ -211,14 +211,14 @@
       "trip_id": "traverse_city",
       "action": "BUY",
       "confidence": 0.88,
-      "best_price_per_person": 565.0,
+      "best_price_per_person": 581.0,
       "predicted_low_per_person": 500.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 51,
-      "data_points": 54,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 51 days left, seats fill and prices climb. At $565/person this is unlikely to get cheaper.",
+      "data_points": 55,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 51 days left, seats fill and prices climb. At $581/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
     {
@@ -231,7 +231,7 @@
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 159,
-      "data_points": 53,
+      "data_points": 54,
       "reasoning": "Google rates this price as HIGH. With 159 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -507,6 +507,11 @@
         "ts": "2026-06-29T18:04:37.112516",
         "morning": 565.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-06-29T22:44:17.955679",
+        "morning": 581.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -772,6 +777,11 @@
       },
       {
         "ts": "2026-06-29T18:04:37.113203",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-06-29T22:44:17.956311",
         "morning": 447.0,
         "afternoon": 447.0
       }
