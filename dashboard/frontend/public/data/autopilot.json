@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-02T12:06:44.124725Z",
+  "updated_at": "2026-07-02T17:32:17.482763Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -39,8 +39,8 @@
       "morning": [
         {
           "available": true,
-          "price_total": 1162.0,
-          "price_per_person": 581.0,
+          "price_total": 1110.0,
+          "price_per_person": 555.0,
           "depart_time": "2026-08-19 10:30",
           "arrive_time": "2026-08-19 12:52",
           "flight_number": "AA 5575",
@@ -199,7 +199,7 @@
       "price_insights": {
         "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": 351.5,
+        "lowest_ppp": 345.5,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
@@ -211,14 +211,14 @@
       "trip_id": "traverse_city",
       "action": "BUY",
       "confidence": 0.88,
-      "best_price_per_person": 581.0,
+      "best_price_per_person": 555.0,
       "predicted_low_per_person": 514.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 48,
-      "data_points": 65,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 48 days left, seats fill and prices climb. At $581/person this is unlikely to get cheaper.",
+      "data_points": 66,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 48 days left, seats fill and prices climb. At $555/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
     {
@@ -226,12 +226,12 @@
       "action": "WAIT",
       "confidence": 0.85,
       "best_price_per_person": 447.0,
-      "predicted_low_per_person": 351.5,
+      "predicted_low_per_person": 345.5,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 156,
-      "data_points": 64,
+      "data_points": 65,
       "reasoning": "Google rates this price as HIGH. With 156 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -562,6 +562,11 @@
         "ts": "2026-07-02T12:06:42.364917",
         "morning": 581.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-02T17:32:16.220993",
+        "morning": 555.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -882,6 +887,11 @@
       },
       {
         "ts": "2026-07-02T12:06:42.365627",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-07-02T17:32:16.221665",
         "morning": 447.0,
         "afternoon": 447.0
       }
