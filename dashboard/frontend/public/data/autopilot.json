@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-06T22:53:46.958719Z",
+  "updated_at": "2026-07-07T07:42:51.720788Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -199,7 +199,7 @@
       "price_insights": {
         "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": 394.5,
+        "lowest_ppp": 326.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
@@ -216,9 +216,9 @@
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
-      "days_to_depart": 44,
-      "data_points": 82,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 44 days left, seats fill and prices climb. At $555/person this is unlikely to get cheaper.",
+      "days_to_depart": 43,
+      "data_points": 83,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 43 days left, seats fill and prices climb. At $555/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
     {
@@ -226,13 +226,13 @@
       "action": "WAIT",
       "confidence": 0.85,
       "best_price_per_person": 447.0,
-      "predicted_low_per_person": 394.5,
+      "predicted_low_per_person": 326.0,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
-      "days_to_depart": 152,
-      "data_points": 81,
-      "reasoning": "Google rates this price as HIGH. With 152 days of runway, hold \u2014 prices typically pull back toward the typical range.",
+      "days_to_depart": 151,
+      "data_points": 82,
+      "reasoning": "Google rates this price as HIGH. With 151 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
   ],
@@ -647,6 +647,11 @@
         "ts": "2026-07-06T22:53:45.913032",
         "morning": 555.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-07T07:42:49.978718",
+        "morning": 555.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -1052,6 +1057,11 @@
       },
       {
         "ts": "2026-07-06T22:53:45.913874",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-07-07T07:42:49.979374",
         "morning": 447.0,
         "afternoon": 447.0
       }
