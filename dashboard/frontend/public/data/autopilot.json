@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-07T07:42:51.720788Z",
+  "updated_at": "2026-07-07T12:24:53.843375Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -67,6 +67,19 @@
           "available": true,
           "price_total": 894.0,
           "price_per_person": 447.0,
+          "depart_time": "2026-12-05 11:15",
+          "arrive_time": "2026-12-05 13:03",
+          "flight_number": "AA 1722",
+          "airline": "American",
+          "return_flight_number": null,
+          "return_depart_time": null,
+          "return_arrive_time": null,
+          "booking_token": null
+        },
+        {
+          "available": true,
+          "price_total": 894.0,
+          "price_per_person": 447.0,
           "depart_time": "2026-12-05 07:05",
           "arrive_time": "2026-12-05 08:50",
           "flight_number": "AA 713",
@@ -96,19 +109,6 @@
           "depart_time": "2026-12-05 09:05",
           "arrive_time": "2026-12-05 10:52",
           "flight_number": "AA 1969",
-          "airline": "American",
-          "return_flight_number": null,
-          "return_depart_time": null,
-          "return_arrive_time": null,
-          "booking_token": null
-        },
-        {
-          "available": true,
-          "price_total": 930.0,
-          "price_per_person": 465.0,
-          "depart_time": "2026-12-05 11:15",
-          "arrive_time": "2026-12-05 13:03",
-          "flight_number": "AA 1722",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -217,7 +217,7 @@
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 43,
-      "data_points": 83,
+      "data_points": 84,
       "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 43 days left, seats fill and prices climb. At $555/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
@@ -231,7 +231,7 @@
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 151,
-      "data_points": 82,
+      "data_points": 83,
       "reasoning": "Google rates this price as HIGH. With 151 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
@@ -652,6 +652,11 @@
         "ts": "2026-07-07T07:42:49.978718",
         "morning": 555.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-07T12:24:51.707385",
+        "morning": 555.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -1062,6 +1067,11 @@
       },
       {
         "ts": "2026-07-07T07:42:49.979374",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-07-07T12:24:51.707905",
         "morning": 447.0,
         "afternoon": 447.0
       }
