@@ -5,9 +5,9 @@
     "alerts_sent": 0
   },
   "orlando": {
-    "baseline_ppp": 391.0,
+    "baseline_ppp": 299.0,
     "set_at": "2026-06-17T03:11:05.082358",
-    "alerts_sent": 1,
-    "last_alert_at": "2026-06-26T17:41:35.864679"
+    "alerts_sent": 2,
+    "last_alert_at": "2026-07-08T06:31:06.818673"
   }
 }
