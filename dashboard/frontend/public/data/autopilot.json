@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-08T22:51:38.497086Z",
+  "updated_at": "2026-07-09T07:39:43.002039Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -39,8 +39,8 @@
       "morning": [
         {
           "available": true,
-          "price_total": 1006.0,
-          "price_per_person": 503.0,
+          "price_total": 1110.0,
+          "price_per_person": 555.0,
           "depart_time": "2026-08-19 10:30",
           "arrive_time": "2026-08-19 12:52",
           "flight_number": "AA 5575",
@@ -55,7 +55,7 @@
       "price_insights": {
         "price_level": "typical",
         "typical_range_ppp": null,
-        "lowest_ppp": 475.5,
+        "lowest_ppp": 500.5,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
@@ -65,8 +65,8 @@
       "morning": [
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 07:05",
           "arrive_time": "2026-12-05 08:50",
           "flight_number": "AA 713",
@@ -78,8 +78,8 @@
         },
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 07:55",
           "arrive_time": "2026-12-05 09:40",
           "flight_number": "AA 691",
@@ -91,11 +91,11 @@
         },
         {
           "available": true,
-          "price_total": 875.0,
-          "price_per_person": 437.5,
-          "depart_time": "2026-12-05 09:05",
-          "arrive_time": "2026-12-05 10:52",
-          "flight_number": "AA 1969",
+          "price_total": 894.0,
+          "price_per_person": 447.0,
+          "depart_time": "2026-12-05 11:15",
+          "arrive_time": "2026-12-05 13:03",
+          "flight_number": "AA 1722",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -104,11 +104,11 @@
         },
         {
           "available": true,
-          "price_total": 875.0,
-          "price_per_person": 437.5,
-          "depart_time": "2026-12-05 11:15",
-          "arrive_time": "2026-12-05 13:03",
-          "flight_number": "AA 1722",
+          "price_total": 918.0,
+          "price_per_person": 459.0,
+          "depart_time": "2026-12-05 09:05",
+          "arrive_time": "2026-12-05 10:52",
+          "flight_number": "AA 1969",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -119,8 +119,8 @@
       "afternoon": [
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 13:40",
           "arrive_time": "2026-12-05 15:26",
           "flight_number": "AA 3045",
@@ -132,8 +132,8 @@
         },
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 14:51",
           "arrive_time": "2026-12-05 16:40",
           "flight_number": "AA 1770",
@@ -145,8 +145,8 @@
         },
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 15:55",
           "arrive_time": "2026-12-05 17:42",
           "flight_number": "AA 2058",
@@ -158,8 +158,8 @@
         },
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 17:01",
           "arrive_time": "2026-12-05 18:50",
           "flight_number": "AA 3034",
@@ -171,8 +171,8 @@
         },
         {
           "available": true,
-          "price_total": 598.0,
-          "price_per_person": 299.0,
+          "price_total": 600.0,
+          "price_per_person": 300.0,
           "depart_time": "2026-12-05 18:55",
           "arrive_time": "2026-12-05 20:39",
           "flight_number": "AA 2093",
@@ -184,8 +184,8 @@
         },
         {
           "available": true,
-          "price_total": 875.0,
-          "price_per_person": 437.5,
+          "price_total": 894.0,
+          "price_per_person": 447.0,
           "depart_time": "2026-12-05 12:15",
           "arrive_time": "2026-12-05 14:02",
           "flight_number": "AA 1972",
@@ -199,7 +199,7 @@
       "price_insights": {
         "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": 299.0,
+        "lowest_ppp": 300.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
@@ -211,29 +211,29 @@
       "trip_id": "traverse_city",
       "action": "BUY",
       "confidence": 0.88,
-      "best_price_per_person": 503.0,
-      "predicted_low_per_person": 475.5,
+      "best_price_per_person": 555.0,
+      "predicted_low_per_person": 500.5,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
-      "days_to_depart": 42,
-      "data_points": 90,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 42 days left, seats fill and prices climb. At $503/person this is unlikely to get cheaper.",
+      "days_to_depart": 41,
+      "data_points": 91,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 41 days left, seats fill and prices climb. At $555/person this is unlikely to get cheaper.",
       "trend": "STABLE"
     },
     {
       "trip_id": "orlando",
       "action": "WAIT",
       "confidence": 0.85,
-      "best_price_per_person": 299.0,
-      "predicted_low_per_person": 299.0,
+      "best_price_per_person": 300.0,
+      "predicted_low_per_person": 300.0,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
-      "days_to_depart": 150,
-      "data_points": 89,
-      "reasoning": "Google rates this price as HIGH. With 150 days of runway, hold \u2014 prices typically pull back toward the typical range.",
-      "trend": "STABLE"
+      "days_to_depart": 149,
+      "data_points": 90,
+      "reasoning": "Google rates this price as HIGH. With 149 days of runway, hold \u2014 prices typically pull back toward the typical range.",
+      "trend": "FALLING"
     }
   ],
   "history": {
@@ -687,6 +687,11 @@
         "ts": "2026-07-08T22:51:37.282441",
         "morning": 503.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-09T07:39:41.393501",
+        "morning": 555.0,
+        "afternoon": null
       }
     ],
     "orlando": [
@@ -1134,6 +1139,11 @@
         "ts": "2026-07-08T22:51:37.283338",
         "morning": 299.0,
         "afternoon": 299.0
+      },
+      {
+        "ts": "2026-07-09T07:39:41.394423",
+        "morning": 300.0,
+        "afternoon": 300.0
       }
     ]
   }
