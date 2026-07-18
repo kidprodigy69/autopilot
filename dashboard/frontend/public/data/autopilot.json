@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-18T06:07:34.815941Z",
+  "updated_at": "2026-07-18T10:58:27.398950Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -55,7 +55,7 @@
       "price_insights": {
         "price_level": "typical",
         "typical_range_ppp": null,
-        "lowest_ppp": 543.5,
+        "lowest_ppp": 524.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
@@ -104,8 +104,8 @@
         },
         {
           "available": true,
-          "price_total": 962.0,
-          "price_per_person": 481.0,
+          "price_total": 930.0,
+          "price_per_person": 465.0,
           "depart_time": "2026-12-05 09:05",
           "arrive_time": "2026-12-05 10:52",
           "flight_number": "AA 1969",
@@ -212,12 +212,12 @@
       "action": "BUY",
       "confidence": 0.88,
       "best_price_per_person": 614.0,
-      "predicted_low_per_person": 543.5,
+      "predicted_low_per_person": 524.0,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
       "days_to_depart": 32,
-      "data_points": 127,
+      "data_points": 128,
       "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 32 days left, seats fill and prices climb. At $614/person this is unlikely to get cheaper.",
       "trend": "RISING"
     },
@@ -231,18 +231,13 @@
       "price_level": "high",
       "aa_nonstop_count": 12,
       "days_to_depart": 140,
-      "data_points": 126,
+      "data_points": 127,
       "reasoning": "Google rates this price as HIGH. With 140 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "RISING"
     }
   ],
   "history": {
     "traverse_city": [
-      {
-        "ts": "2026-06-18T08:50:03.586560",
-        "morning": 581.0,
-        "afternoon": null
-      },
       {
         "ts": "2026-06-18T12:49:10.727630",
         "morning": 581.0,
@@ -837,14 +832,14 @@
         "ts": "2026-07-18T06:07:33.231779",
         "morning": 614.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-18T10:58:25.748773",
+        "morning": 614.0,
+        "afternoon": null
       }
     ],
     "orlando": [
-      {
-        "ts": "2026-06-17T23:13:14.263017",
-        "morning": 447.0,
-        "afternoon": 447.0
-      },
       {
         "ts": "2026-06-18T12:49:10.727911",
         "morning": 447.0,
@@ -1437,6 +1432,11 @@
       },
       {
         "ts": "2026-07-18T06:07:33.232761",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-07-18T10:58:25.749933",
         "morning": 447.0,
         "afternoon": 447.0
       }
