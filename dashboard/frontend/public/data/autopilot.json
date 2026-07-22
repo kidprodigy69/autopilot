@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-21T22:41:49.435699Z",
+  "updated_at": "2026-07-22T06:32:00.599017Z",
   "trips": [
     {
       "id": "traverse_city",
@@ -55,7 +55,7 @@
       "price_insights": {
         "price_level": "typical",
         "typical_range_ppp": null,
-        "lowest_ppp": 522.5,
+        "lowest_ppp": 611.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 1,
@@ -67,9 +67,9 @@
           "available": true,
           "price_total": 894.0,
           "price_per_person": 447.0,
-          "depart_time": "2026-12-05 07:55",
-          "arrive_time": "2026-12-05 09:40",
-          "flight_number": "AA 691",
+          "depart_time": "2026-12-05 07:05",
+          "arrive_time": "2026-12-05 08:50",
+          "flight_number": "AA 713",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -80,9 +80,9 @@
           "available": true,
           "price_total": 894.0,
           "price_per_person": 447.0,
-          "depart_time": "2026-12-05 07:05",
-          "arrive_time": "2026-12-05 08:50",
-          "flight_number": "AA 713",
+          "depart_time": "2026-12-05 07:55",
+          "arrive_time": "2026-12-05 09:40",
+          "flight_number": "AA 691",
           "airline": "American",
           "return_flight_number": null,
           "return_depart_time": null,
@@ -199,7 +199,7 @@
       "price_insights": {
         "price_level": "high",
         "typical_range_ppp": null,
-        "lowest_ppp": 332.5,
+        "lowest_ppp": 333.0,
         "google_history_ppp": []
       },
       "aa_nonstop_count": 12,
@@ -212,13 +212,13 @@
       "action": "BUY",
       "confidence": 0.88,
       "best_price_per_person": 647.0,
-      "predicted_low_per_person": 522.5,
+      "predicted_low_per_person": 611.0,
       "typical_range_ppp": null,
       "price_level": "typical",
       "aa_nonstop_count": 1,
-      "days_to_depart": 29,
-      "data_points": 142,
-      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 29 days left, seats fill and prices climb. At $647/person this is unlikely to get cheaper.",
+      "days_to_depart": 28,
+      "data_points": 143,
+      "reasoning": "Thin route \u2014 only 1 nonstop AA option(s) found. With 28 days left, seats fill and prices climb. At $647/person this is unlikely to get cheaper.",
       "trend": "RISING"
     },
     {
@@ -226,23 +226,18 @@
       "action": "WAIT",
       "confidence": 0.85,
       "best_price_per_person": 447.0,
-      "predicted_low_per_person": 332.5,
+      "predicted_low_per_person": 333.0,
       "typical_range_ppp": null,
       "price_level": "high",
       "aa_nonstop_count": 12,
-      "days_to_depart": 137,
-      "data_points": 141,
-      "reasoning": "Google rates this price as HIGH. With 137 days of runway, hold \u2014 prices typically pull back toward the typical range.",
+      "days_to_depart": 136,
+      "data_points": 142,
+      "reasoning": "Google rates this price as HIGH. With 136 days of runway, hold \u2014 prices typically pull back toward the typical range.",
       "trend": "STABLE"
     }
   ],
   "history": {
     "traverse_city": [
-      {
-        "ts": "2026-06-21T22:56:35.652354",
-        "morning": 581.0,
-        "afternoon": null
-      },
       {
         "ts": "2026-06-22T09:50:40.461239",
         "morning": 581.0,
@@ -837,14 +832,14 @@
         "ts": "2026-07-21T22:41:48.149258",
         "morning": 647.0,
         "afternoon": null
+      },
+      {
+        "ts": "2026-07-22T06:31:58.366788",
+        "morning": 647.0,
+        "afternoon": null
       }
     ],
     "orlando": [
-      {
-        "ts": "2026-06-21T22:56:35.652734",
-        "morning": 447.0,
-        "afternoon": 447.0
-      },
       {
         "ts": "2026-06-22T09:50:40.461774",
         "morning": 447.0,
@@ -1437,6 +1432,11 @@
       },
       {
         "ts": "2026-07-21T22:41:48.150537",
+        "morning": 447.0,
+        "afternoon": 447.0
+      },
+      {
+        "ts": "2026-07-22T06:31:58.367979",
         "morning": 447.0,
         "afternoon": 447.0
       }
